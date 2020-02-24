@@ -64,6 +64,7 @@ void buffer_print_page(void* data){
 	printf("\n-------------------------Frame ID: %d", page->frame_id);
 	printf("\ndirty_flag: %c",page->dirty_flag);
 	printf("\nstatus: %c",page->status);
+	printf("data: %s" + page->data);
 	printf("\n-------------------------");
 }
 
