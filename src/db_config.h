@@ -1,0 +1,10 @@
+#ifndef CONFIG_H_INCLUDED
+#define CONFIG_H_INCLUDED
+
+#define BLOCK_SIZE 10
+#define BUFFER_SIZE 10
+
+//#define BLOCK_SIZE 4000
+//#define BUFFER_SIZE 100000
+
+#endif
