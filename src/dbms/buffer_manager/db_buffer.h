@@ -13,7 +13,15 @@
 #define CLEAN 'C'
 #define DIRTY 'D'
 
+
+unsigned long long miss_ration = 0;
+unsigned long long hit_ration = 0;
+unsigned long long operations = 0;
+
 struct Page{
+
+	int file_id;
+	int block_id;
 
 	int frame_id;
 	char * data; //pointer to allocated_memory frame
@@ -38,6 +46,8 @@ void start_buffer() {
 			//printf("\nA: %d, D:%d", i, i / BLOCK_SIZE);
 			struct Page *page = &pages[i / BLOCK_SIZE];
 			page->frame_id = i / BLOCK_SIZE;
+			page->block_id = 0;
+			page->file_id = 0;
 			page->dirty_flag = CLEAN;
 			page->status = STATUS_FREE;
 			page->data = &allocated_memory[i];
@@ -59,12 +69,37 @@ void start_buffer() {
 }
 
 
+struct Page * find_page(int file_id, int block_id){
+	for(int i; i < BUFFER_SIZE; i++){
+		struct Page * page = &pages[i];
+		if(page->file_id == file_id && page->block_id == block_id){
+			return page;
+		}
+	}
+	return NULL;
+}
+
+
+void request_page(int file_id, int block_id){
+	struct Page * page = find_page(file_id, block_id);
+
+	if(page == NULL){
+
+	}else{
+
+	}
+
+
+}
+
+
 void buffer_print_page(void* data){
 	struct Page * page = (struct Page*) data;
 	printf("\n-------------------------Frame ID: %d", page->frame_id);
+	printf("\nCurrent Page ID: %d-%d",page->file_id, page->block_id);
 	printf("\ndirty_flag: %c",page->dirty_flag);
 	printf("\nstatus: %c",page->status);
-	printf("data: %s" + page->data);
+	//printf("\ndata: %s", page->data);
 	printf("\n-------------------------");
 }
 
