@@ -1,3 +1,7 @@
+/*
+ * This file has simple functions to access data on the secondary storage media.
+ * These functions make system calls and are expected to be very fast.
+ */
 #ifndef FILE_H_INCLUDED
 #define FILE_H_INCLUDED
 
