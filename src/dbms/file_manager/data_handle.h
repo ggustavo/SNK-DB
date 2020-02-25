@@ -20,4 +20,10 @@ int read_int(char *data, unsigned long offset) {
 	return *(int*) buffer;
 }
 
+void write_string(char * data, char * string, int string_size, unsigned long offset){
+	for(int i = 0; i < string_size; i++){
+		data[offset + i] = string[i];
+	}
+}
+
 #endif

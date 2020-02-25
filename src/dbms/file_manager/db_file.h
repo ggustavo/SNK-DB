@@ -28,14 +28,14 @@ void file_close(int file_descriptor){
 void file_read(int file_descriptor, long block_id, char * frame, int block_size){
 	lseek(file_descriptor, block_id * block_size, 0);
 	if( read(file_descriptor, frame, block_size) == -1 ){
-		printf("\n[ERR0] Read Page %d-%d",file_descriptor,block_id);
+		printf("\n[ERR0] Read Page %d-%ld",file_descriptor,block_id);
 	}
 }
 
 void file_write(int file_descriptor, long block_id, char * frame, int block_size){
 	lseek(file_descriptor, block_id * block_size, 0);
 	if( write(file_descriptor, frame, block_size) == -1){
-		printf("\n[ERR0] Read Page %d-%d",file_descriptor,block_id);
+		printf("\n[ERR0] Write Page %d-%ld",file_descriptor,block_id);
 	}
 }
 

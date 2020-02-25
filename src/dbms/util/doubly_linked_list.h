@@ -14,7 +14,7 @@ struct List{
 
 
 struct Node {
-    void* data;
+    void* content;
     struct Node* next;
     struct Node* prev;
 };
@@ -29,17 +29,19 @@ struct List* list_create(void (*print_function)(void*), void (*free_function)(vo
 	return list;
 }
 
-struct Node * list_create_node(void* data){
+struct Node * list_create_node(void* content){
 	struct Node * new_node = (struct Node*) malloc(sizeof(struct Node));
 	new_node->next = NULL;
 	new_node->prev = NULL;
-	new_node->data = data;
+	new_node->content = content;
 	return new_node;
 }
 
-void list_insert_head(struct List *list, void *data) {
-	struct Node *x = list_create_node(data);
 
+
+void list_insert_node_head(struct List * list, struct Node * x) {
+	x->next = NULL;
+	x->prev = NULL;
 	if (list->head == NULL) {
 		list->head = x;
 		list->tail = x;
@@ -51,9 +53,14 @@ void list_insert_head(struct List *list, void *data) {
 	list->size++;
 }
 
-void list_insert_tail(struct List *list, void *data) {
-	struct Node *x = list_create_node(data);
+void list_insert_head(struct List * list, void *content) {
+	struct Node * x = list_create_node(content);
+	list_insert_node_head(list, x);
+}
 
+void list_insert_node_tail(struct List * list, struct Node * x) {
+	x->next = NULL;
+	x->prev = NULL;
 	if (list->head == NULL) {
 		list->head = x;
 		list->tail = x;
@@ -63,6 +70,11 @@ void list_insert_tail(struct List *list, void *data) {
 		list->tail = x;
 	}
 	list->size++;
+}
+
+void list_insert_tail(struct List *list, void * content) {
+	struct Node * x = list_create_node(content);
+	list_insert_node_tail(list, x);
 }
 
 struct Node * list_remove(struct List * list, struct Node*x) {
@@ -94,11 +106,11 @@ struct Node * list_remove_tail(struct List * list) {
 	return list_remove(list,list->tail);
 }
 
-struct Node * list_find_node(struct List * list, void* data, int(*compare_function)(void*,void*)) {
+struct Node * list_find_node(struct List * list, void* content, int(*compare_function)(void*,void*)) {
 
 	struct Node * x = list->head;
 	while(x != NULL){
-		if(compare_function(data,x->data)){
+		if(compare_function(content,x->content)){
 			return x;
 		}
 		x = x->next;
@@ -106,21 +118,21 @@ struct Node * list_find_node(struct List * list, void* data, int(*compare_functi
 	return NULL;
 }
 
-void * list_find_data(struct List * list, void* element, int(*compare_function)(void*,void*)) {
-	return list_find_node(list,element,compare_function)->data;
+void * list_find_content(struct List * list, void* element, int(*compare_function)(void*,void*)) {
+	return list_find_node(list,element,compare_function)->content;
 }
 
 void list_print(struct List* list){
 	struct Node * x = list->head;
 	while(x != NULL){
-		list->print_function(x->data);
+		list->print_function(x->content);
 		x = x->next;
 	}
 }
 void list_print_inverse(struct List* list){
 	struct Node * x = list->tail;
 	while(x != NULL){
-		list->print_function(x->data);
+		list->print_function(x->content);
 		x = x->prev;
 	}
 }
@@ -128,8 +140,10 @@ void list_print_inverse(struct List* list){
 static void list_free_node(struct List* list, struct Node * x){
 	x->next = NULL;
 	x->prev = NULL;
-	list->free_function(x->data);
-	x->data = NULL;
+	if(list->free_function != NULL){
+		list->free_function(x->content);
+	}
+	x->content = NULL;
 	free(x);
 }
 

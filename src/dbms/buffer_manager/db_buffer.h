@@ -9,40 +9,43 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "../db_config.h"
+#include "../file_manager/db_file.h"
+#include "../util/doubly_linked_list.h"
 
 /*
  * STATUS_LOCKED -> When the query processor is performing an operation on the page (reading or writing),
  * otherwise: STATUS_UNLOCKED
  */
-#define STATUS_LOCKED 'L';
-#define STATUS_UNLOCKED 'U';
+#define STATUS_LOCKED 'L'
+#define STATUS_UNLOCKED 'U'
 
 /*
  * DIRTY -> When the page received write operations (insert, update, delete),
  * otherwise: CLEAN
  */
-#define DIRTY 'D'
-#define CLEAN 'C'
+#define DIRTY 'W'
+#define CLEAN 'R'
 
 /*
  * The Query Processor indicates that it needs to READ or WRITE when requesting a page.
  */
-#define READ 'R'
-#define WRITE 'W'
+#define READ_REQUEST 'R'
+#define WRITE_REQUEST 'W'
 
 /*
  * Statistics used to evaluate the performance of the buffer manager
  */
-unsigned long long operations = 0; //Number of requests
+unsigned long long int operations = 0; //Number of requests
 
-unsigned long long miss_operations = 0; //Number of requests when the data IS NOT in-memory
-unsigned long long hit_operations = 0;  //Number of requests when the data IS in-memory
+unsigned long long int miss_operations = 0; //Number of requests when the data IS NOT in-memory
+unsigned long long int hit_operations = 0;  //Number of requests when the data IS in-memory
 
-unsigned long long write_operations = 0; //Number of write requests
-unsigned long long read_operations = 0;  //Number of read requests
+unsigned long long int write_operations = 0; //Number of write requests
+unsigned long long int read_operations = 0;  //Number of read requests
 
-unsigned long long flush_operations = 0; //Number of pages written on the secondary storage media
-unsigned long long load_operations = 0; //Number of pages loaded from secondary storage media to memory
+unsigned long long int flush_operations = 0; //Number of pages written on the secondary storage media
+unsigned long long int load_operations = 0; //Number of pages loaded from secondary storage media to memory
 
 
 struct Page{
@@ -68,6 +71,7 @@ struct Page{
  */
 char * allocated_memory;
 struct Page * pages;
+struct List * free_list;
 
 /*
  * Reset the page to its original state. Note: This does not reset the data allocated in-memory for the frame.
@@ -78,6 +82,7 @@ struct Page * buffer_reset_page(struct Page *page) {
 		page->file_id = -1;
 		page->dirty_flag = CLEAN;
 		page->status = STATUS_UNLOCKED;
+		return page;
 	}
 	printf("\n[ERR0] CLean Page NULL");
 	return NULL;
@@ -87,7 +92,7 @@ struct Page * buffer_reset_page(struct Page *page) {
  * Initializes in-memory storage structures of the buffer manager.
  */
 void buffer_start() {
-
+	free_list = list_create(NULL,NULL);
 	allocated_memory = (char*) malloc( BUFFER_SIZE * BLOCK_SIZE );
 	pages = (struct Page*) malloc(sizeof(struct Page) * BUFFER_SIZE);
 
@@ -106,6 +111,7 @@ void buffer_start() {
 			page->data = &allocated_memory[i]; //set the first pointer of this frame into the page
 			page->extended_attributes = NULL;
 			buffer_reset_page(page);
+			list_insert_tail(free_list,page);
 		}
 
 	}
@@ -124,7 +130,7 @@ void buffer_start() {
  * This function needs to be optimized for a hash table or something faster than a sequential search.
  */
 struct Page * buffer_find_page(int file_id, long block_id){
-	for(int i; i < BUFFER_SIZE; i++){
+	for(int i = 0; i < BUFFER_SIZE; i++){
 		struct Page * page = &pages[i];
 		if(page->file_id == file_id && page->block_id == block_id){
 			return page;
@@ -136,28 +142,31 @@ struct Page * buffer_find_page(int file_id, long block_id){
 /*
  * If page is DIRTY this function writes the data on the secondary storage media.
  */
-struct Page * buffer_flush_page(int file_id, long block_id, struct Page * target){
+struct Page * buffer_flush_page(struct Page * target){
 	if(target != NULL){
 		if(target->dirty_flag == DIRTY){
 			flush_operations++;
-			file_write(file_id, block_id, target->data, BLOCK_SIZE);
+			file_write(target->file_id, target->block_id, target->data, BLOCK_SIZE);
 		}
 		return target;
 	}
-	printf("\n[ERR0] Flush Page %d-%d NULL",file_id,block_id);
+	printf("\n[ERR0] Flush Page NULL");
 	return NULL;
 }
 
 /*
  * Loads the page from secondary storage media to memory
  */
-struct Page * buffer_load_page(int file_id, long block_id, struct Page *target) {
+struct Page * buffer_load_page(int file_id, long block_id, struct Page * target) {
 	if (target != NULL) {
+		buffer_reset_page(target);
 		load_operations++;
 		file_read(file_id, block_id, target->data, BLOCK_SIZE);
+		target->file_id = file_id;
+		target->block_id = block_id;
 		return target;
 	}
-	printf("\n[ERR0] Load Page %d-%d NULL",file_id,block_id);
+	printf("\n[ERR0] Load Page %d#%ld NULL",file_id,block_id);
 	return NULL;
 }
 
@@ -176,7 +185,7 @@ void buffer_computes_request_statistics(struct Page * page, char operation){
 	}else{
 		hit_operations++;
 	}
-	if(operation == READ){
+	if(operation == READ_REQUEST){
 		read_operations++;
 	}else{
 		write_operations++;
@@ -185,10 +194,54 @@ void buffer_computes_request_statistics(struct Page * page, char operation){
 }
 
 
+char buffer_is_full(){
+	if(free_list->size < 0){
+		printf("\n[ERR0] Free List negative size ...");
+	}
+	if(free_list->size == 0){
+		return TRUE;
+	}
+	return FALSE;
+}
+
+
+struct Page * buffer_get_free_page(){
+	if(buffer_is_full() == TRUE){
+		printf("\n[ERR0] Get Free Pages ...");
+		return NULL;
+	}
+	struct Node * node = list_remove_head(free_list);
+	struct Page * page = (struct Page *) node->content;
+	list_free_node(free_list, node);
+	return page;
+}
+
+void buffer_add_new_free_page(struct Page * page){
+	buffer_reset_page(page);
+	list_insert_tail(free_list,page);
+}
+
+
+void set_dirty(struct Page * page, char operation){
+	if(operation == DIRTY && page->dirty_flag == CLEAN){
+		page->dirty_flag = DIRTY;
+	}
+}
+
+
 void buffer_print_page(void* data){
 	struct Page * page = (struct Page*) data;
+	if(page->file_id == -1){
+		printf("(NULL), ");
+	}else{
+		printf("%c(%d#%ld), ",page->dirty_flag,page->file_id, page->block_id);
+	}
+}
+
+void buffer_print_page_complete(void* data){
+	struct Page * page = (struct Page*) data;
 	printf("\n-------------------------Frame ID: %d", page->frame_id);
-	printf("\nCurrent Page ID: %d-%d",page->file_id, page->block_id);
+	printf("\nCurrent Page ID: %d#%ld",page->file_id, page->block_id);
 	printf("\ndirty_flag: %c",page->dirty_flag);
 	printf("\nstatus: %c",page->status);
 	printf("\ndata: ");
@@ -199,6 +252,15 @@ void buffer_print_page(void* data){
 	printf("\n-------------------------");
 }
 
+
+void buffer_print_statistics(){ //%llu for Linux, %I64u for Windows
+	printf("\n-------------------Buffer Statistics---------------------------");
+	printf("\nOperations: %I64u ",operations);
+	printf("(hit: %I64u miss: %I64u) ", hit_operations, miss_operations);
+	printf("(write: %I64u read: %I64u)", write_operations, read_operations);
+	printf("\nloaded: %I64u flushed: %I64u", load_operations, flush_operations);
+	printf("\n---------------------------------------------------------------");
+}
 
 /* Examples using pointers
 	n == *p2 == **p1
