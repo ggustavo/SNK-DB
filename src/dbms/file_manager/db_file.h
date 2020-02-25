@@ -1,4 +1,3 @@
-
 #ifndef FILE_H_INCLUDED
 #define FILE_H_INCLUDED
 
@@ -24,12 +23,16 @@ void file_close(int file_descriptor){
 
 void file_read(int file_descriptor, long block_id, char * frame, int block_size){
 	lseek(file_descriptor, block_id * block_size, 0);
-	read(file_descriptor, frame, block_size);
+	if( read(file_descriptor, frame, block_size) == -1 ){
+		printf("\n[ERR0] Read Page %d-%d",file_descriptor,block_id);
+	}
 }
 
 void file_write(int file_descriptor, long block_id, char * frame, int block_size){
 	lseek(file_descriptor, block_id * block_size, 0);
-	write(file_descriptor, frame, block_size);
+	if( write(file_descriptor, frame, block_size) == -1){
+		printf("\n[ERR0] Read Page %d-%d",file_descriptor,block_id);
+	}
 }
 
 
