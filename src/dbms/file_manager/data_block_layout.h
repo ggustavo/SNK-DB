@@ -45,9 +45,9 @@
 
 struct BlockHeader{
 	int block_id;
-	int used_size; //space used by tuples
-	int lsn; //The log sequence number (LSN) used in the recovery process
-	int tuple_index_size; //number of tuples in block
+	int used_size;                //space used by tuples
+	int lsn;                      //The log sequence number (LSN) used in the recovery process
+	int tuple_index_size;         //number of tuples in block
 	int first_tuple_index_offset; //index for the first tuple
 };
 
@@ -63,17 +63,15 @@ struct BlockHeader * block_create_header(){
 	return header;
 }
 
-
-
 /*
  * Read char * data content block header and returns in a structure format (struct BlockHeader).
  */
 struct BlockHeader * block_read_header(struct BlockHeader * header, char * data){
-	header->block_id =             read_int(data, OFFSET_BLOCK_ID);
-	header->used_size =            read_int(data, OFFSET_USED_SIZE);
-	header->lsn =    			   read_int(data, OFFSET_LSN);
-	header->tuple_index_size =     read_int(data, OFFSET_TUPLES_INDEX_SIZE);
-	header->first_tuple_index_offset =    read_int(data, OFFSET_FIRST_TUPLE_INDEX);
+	header->block_id =                 read_int(data, OFFSET_BLOCK_ID);
+	header->used_size =                read_int(data, OFFSET_USED_SIZE);
+	header->lsn =    			       read_int(data, OFFSET_LSN);
+	header->tuple_index_size =         read_int(data, OFFSET_TUPLES_INDEX_SIZE);
+	header->first_tuple_index_offset = read_int(data, OFFSET_FIRST_TUPLE_INDEX);
 
 	return header;
 }

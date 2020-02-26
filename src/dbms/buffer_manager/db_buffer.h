@@ -38,25 +38,25 @@
  */
 unsigned long long int operations = 0; //Number of requests
 
-unsigned long long int miss_operations = 0; //Number of requests when the data IS NOT in-memory
-unsigned long long int hit_operations = 0;  //Number of requests when the data IS in-memory
+unsigned long long int miss_operations = 0;  //Number of requests when the data IS NOT in-memory
+unsigned long long int hit_operations  = 0;  //Number of requests when the data IS in-memory
 
-unsigned long long int write_operations = 0; //Number of write requests
-unsigned long long int read_operations = 0;  //Number of read requests
+unsigned long long int write_operations = 0;  //Number of write requests
+unsigned long long int read_operations  = 0;  //Number of read requests
 
-unsigned long long int flush_operations = 0; //Number of pages written on the secondary storage media
-unsigned long long int load_operations = 0; //Number of pages loaded from secondary storage media to memory
+unsigned long long int flush_operations = 0;  //Number of pages written on the secondary storage media
+unsigned long long int load_operations  = 0;  //Number of pages loaded from secondary storage media to memory
 
 
 struct Page{
 
-	int file_id; //used to find the file on the secondary storage media
-	long block_id; //used to find the block inside the file
+	int file_id;     //used to find the file on the secondary storage media
+	long block_id;   //used to find the block inside the file
 
-	int frame_id; //frame id of page
-	char * data; //pointer to allocated_memory frame
+	int frame_id;    //frame id of page
+	char * data;     //pointer to allocated_memory frame
 
-	char status; //status of page (STATUS_LOCKED or STATUS_UNLOCKED)
+	char status;     //status of page (STATUS_LOCKED or STATUS_UNLOCKED)
 	char dirty_flag; //if the page is DIRTY or CLEAN
 
 	void * extended_attributes; //used to add new attributes depending on the page replacement policy

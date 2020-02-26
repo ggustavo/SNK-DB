@@ -7,7 +7,7 @@
 void write_int(char *data, int number, unsigned long offset) {
 	data[offset + 3] = (number >> 24) & 0xFF;
 	data[offset + 2] = (number >> 16) & 0xFF;
-	data[offset + 1] = (number >> 8) & 0xFF;
+	data[offset + 1] = (number >> 8)  & 0xFF;
 	data[offset] = number & 0xFF;
 }
 
