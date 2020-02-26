@@ -15,10 +15,12 @@ void insert_MRU(struct List * list, struct Node * node);
 struct Node * remove_LRU(struct List * list);
 void move_to_MRU(struct List * list, struct Page * page);
 
+
 struct List * list;
 
 /*
  * This function is called after initializing the buffer and before page requests.
+ * Initialize the structures used in the page replacement policy here.
  */
 void buffer_policy_start(){
 	list = list_create(buffer_print_page,NULL);
@@ -43,10 +45,11 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 
 			page = buffer_get_free_page();
 			struct Node * new_node = list_create_node(page);
-			buffer_load_page(file_id, block_id, page); //Read new data from storage media
+			buffer_load_page(file_id, block_id, page); //Read the data from storage media
 			insert_MRU(list, new_node);
 
 		} else { //need a replacement
+
 			printf("\n ---- REPLACEMENT ------ ");
 			struct Node * lru_node = remove_LRU(list);
 			struct Page * victim = lru_node->content; //Get the LRU Page

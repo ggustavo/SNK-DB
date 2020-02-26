@@ -16,8 +16,14 @@ int read_int(char *data, unsigned long offset) {
 	buffer[3] = data[offset + 3];
 	buffer[2] = data[offset + 2];
 	buffer[1] = data[offset + 1];
-	buffer[0] = data[offset];
+	buffer[0] = data[offset    ];
 	return *(int*) buffer;
+}
+
+void write_string(char * data, char * string, int string_size, unsigned long offset){
+	for(int i = 0; i < string_size; i++){
+		data[offset + i] = string[i];
+	}
 }
 
 void write_string(char * data, char * string, int string_size, unsigned long offset){
