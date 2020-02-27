@@ -26,10 +26,4 @@ void write_string(char * data, char * string, int string_size, unsigned long off
 	}
 }
 
-void write_string(char * data, char * string, int string_size, unsigned long offset){
-	for(int i = 0; i < string_size; i++){
-		data[offset + i] = string[i];
-	}
-}
-
 #endif

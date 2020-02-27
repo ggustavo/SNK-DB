@@ -48,6 +48,6 @@ int main(void) {
 	buffer_print_statistics();
 	//printf("\nPress Any Key to Continue\n");
 	//getchar();
-	return EXIT_SUCCESS;
+	return 0;
 }
 

@@ -26,5 +26,8 @@ struct DataFile * data_file_fill_meta(struct DataFile * data_file){
 	return data_file;
 }
 
+void write_meta_block(struct DataFile * data_file){
+
+}
 
 #endif
