@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include "../dbms/db_kernel.h"
-#include "../dbms/query_processing/data_file.h"
+#include "../dbms/file_manager/data_file.h"
 #include "../dbms/file_manager/block_header.h"
 
 
