@@ -10,56 +10,38 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "../db_config.h"
-#include "../file_manager/db_file.h"
+#include "../file_manager/db_access_file.h"
 #include "../util/doubly_linked_list.h"
 
-/*
- * STATUS_LOCKED -> When the query processor is performing an operation on the page (reading or writing),
- * otherwise: STATUS_UNLOCKED
- */
-#define STATUS_LOCKED 'L'
-#define STATUS_UNLOCKED 'U'
 
-/*
- * DIRTY -> When the page received write operations (insert, update, delete),
- * otherwise: CLEAN
- */
-#define DIRTY 'W'
-#define CLEAN 'R'
-
-/*
- * The Query Processor indicates that it needs to READ or WRITE when requesting a page.
- */
-#define READ_REQUEST 'R'
-#define WRITE_REQUEST 'W'
 
 /*
  * Statistics used to evaluate the performance of the buffer manager
  */
 unsigned long long int operations = 0; //Number of requests
 
-unsigned long long int miss_operations = 0;  //Number of requests when the data IS NOT in-memory
-unsigned long long int hit_operations  = 0;  //Number of requests when the data IS in-memory
+unsigned long long int miss_operations = 0;  // Number of requests when the data IS NOT in-memory
+unsigned long long int hit_operations  = 0;  // Number of requests when the data IS in-memory
 
-unsigned long long int write_operations = 0;  //Number of write requests
-unsigned long long int read_operations  = 0;  //Number of read requests
+unsigned long long int write_operations = 0;  // Number of write requests
+unsigned long long int read_operations  = 0;  // Number of read requests
 
-unsigned long long int flush_operations = 0;  //Number of pages written on the secondary storage media
-unsigned long long int load_operations  = 0;  //Number of pages loaded from secondary storage media to memory
+unsigned long long int flush_operations = 0;  // Number of pages written on the secondary storage media
+unsigned long long int load_operations  = 0;  // Number of pages loaded from secondary storage media to memory
 
 
 struct Page{
 
-	int file_id;     //used to find the file on the secondary storage media
-	long block_id;   //used to find the block inside the file
+	int file_id;     // Used to find the file on the secondary storage media
+	long block_id;   // Used to find the block inside the file
 
-	int frame_id;    //frame id of page
-	char * data;     //pointer to allocated_memory frame
+	int frame_id;    // Frame id of page
+	char * data;     // Pointer to allocated_memory frame
 
-	char status;     //status of page (STATUS_LOCKED or STATUS_UNLOCKED)
-	char dirty_flag; //if the page is DIRTY or CLEAN
+	char status;     // Status of page (STATUS_LOCKED or STATUS_UNLOCKED)
+	char dirty_flag; // If the page is DIRTY or CLEAN
 
-	void * extended_attributes; //used to add new attributes depending on the page replacement policy
+	void * extended_attributes; // Used to add new attributes depending on the page replacement policy
 };
 
 
@@ -80,8 +62,8 @@ struct Page * buffer_reset_page(struct Page *page) {
 	if (page != NULL) {
 		page->block_id = -1;
 		page->file_id = -1;
-		page->dirty_flag = CLEAN;
-		page->status = STATUS_UNLOCKED;
+		page->dirty_flag = PAGE_CLEAN;
+		page->status = PAGE_STATUS_UNLOCKED;
 		return page;
 	}
 	printf("\n[ERR0] CLean Page NULL");
@@ -96,16 +78,16 @@ void buffer_start() {
 	allocated_memory = (char*) malloc( BUFFER_SIZE * BLOCK_SIZE );
 	pages = (struct Page*) malloc(sizeof(struct Page) * BUFFER_SIZE);
 
-	//BUFFER_SIZE * BLOCK_SIZE determines the size of the space allocated in-memory for data
+	// BUFFER_SIZE * BLOCK_SIZE determines the size of the space allocated in-memory for data
 	int N = BUFFER_SIZE * BLOCK_SIZE;
 
-	for (int i = 0; i < N; i++) { //for each allocated byte
-		allocated_memory[i] = 0; //initialize the byte with 0
+	for (int i = 0; i < N; i++) { // For each allocated byte
+		allocated_memory[i] = 0; // Initialize the byte with 0
 
 		if (i % BLOCK_SIZE == 0) {
-			//example: if the block_size is equal to 10, this "if" is true when i = {0, 10, 20, ...}
+			// Example: if the block_size is equal to 10, this "if" is true when i = {0, 10, 20, ...}
 
-			//The idea is to map each frame to be managed by a page
+			// The idea is to map each frame to be managed by a page
 			struct Page * page = &pages[i / BLOCK_SIZE];
 			page->frame_id = i / BLOCK_SIZE;
 			page->data = &allocated_memory[i]; //set the first pointer of this frame into the page
@@ -144,7 +126,7 @@ struct Page * buffer_find_page(int file_id, long block_id){
  */
 struct Page * buffer_flush_page(struct Page * target){
 	if(target != NULL){
-		if(target->dirty_flag == DIRTY){
+		if(target->dirty_flag == PAGE_DIRTY){
 			flush_operations++;
 			file_write(target->file_id, target->block_id, target->data, BLOCK_SIZE);
 		}
@@ -173,7 +155,7 @@ struct Page * buffer_load_page(int file_id, long block_id, struct Page * target)
 
 
 /*
- * computes the statistics of requests (operations, miss, hits, reads, writes)
+ * Computes the statistics of requests (operations, miss, hits, reads, writes)
  * Rule -> operations = (miss + hits) = (reads + writes)
  */
 void buffer_computes_request_statistics(struct Page * page, char operation){
@@ -223,13 +205,13 @@ void buffer_add_new_free_page(struct Page * page){
 
 
 void set_dirty(struct Page * page, char operation){
-	if(operation == DIRTY && page->dirty_flag == CLEAN){
-		page->dirty_flag = DIRTY;
+	if(operation == PAGE_DIRTY && page->dirty_flag == PAGE_CLEAN){
+		page->dirty_flag = PAGE_DIRTY;
 	}
 }
 
 
-void buffer_print_page(void* data){
+void buffer_print_page(void * data){
 	struct Page * page = (struct Page*) data;
 	if(page->file_id == -1){
 		printf("(NULL), ");
@@ -238,18 +220,18 @@ void buffer_print_page(void* data){
 	}
 }
 
-void buffer_print_page_complete(void* data){
+void buffer_print_page_complete(void * data){
 	struct Page * page = (struct Page*) data;
-	printf("\n-------------------------Frame ID: %d", page->frame_id);
+	printf("\n------------------------- Frame ID: %d", page->frame_id);
 	printf("\nCurrent Page ID: %d#%ld",page->file_id, page->block_id);
 	printf("\ndirty_flag: %c",page->dirty_flag);
-	printf("\nstatus: %c",page->status);
-	printf("\ndata: ");
+	printf("\nStatus: %c",page->status);
+	printf("\nData: ");
 	for(int i = 0; i < BLOCK_SIZE; i++){
 		printf("%c",page->data[i]);
 	}
 
-	printf("\n-------------------------");
+	printf("\n--------------------------------------");
 }
 
 

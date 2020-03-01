@@ -1,4 +1,4 @@
-
+/*
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -19,7 +19,7 @@ int main(void) {
 		printf("\nMRU -> ");
 		list_print(list);
 		printf("<- LRU");
-		write_string(p->data,"FILE--XX",BLOCK_SIZE,0);
+		handler_write_string(p->data,"FILE--XX",BLOCK_SIZE,0);
 		//buffer_print_page_complete(p);
 
 	}
@@ -50,4 +50,4 @@ int main(void) {
 	//getchar();
 	return 0;
 }
-
+*/

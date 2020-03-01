@@ -1,3 +1,7 @@
+/*
+ * db_kernel.h starts in the correct order all services or components of the system.
+ */
+
 #ifndef KERNEL_H_INCLUDED
 #define KERNEL_H_INCLUDED
 

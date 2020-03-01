@@ -1,5 +1,5 @@
 /*
- * This file has simple functions to access data on the secondary storage media.
+ * This file contains simple functions to access data on the secondary storage media.
  * These functions make system calls and are expected to be very fast.
  */
 #ifndef FILE_H_INCLUDED
@@ -8,9 +8,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <sys/file.h>  //to Open
-#include <sys/types.h> //to Read and Write
-#include <unistd.h>    //to Close
+#include <sys/file.h>  // To Open
+#include <sys/types.h> // To Read and Write
+#include <unistd.h>    // To Close
 
 
 int file_open(char * path) {

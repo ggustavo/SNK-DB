@@ -1,22 +1,28 @@
+/*
+ * A basic implementation of a Doubly Linked List (DLL)
+ */
+
 #ifndef DLLIST_H_INCLUDED
 #define DLLIST_H_INCLUDED
 
 #include <stdlib.h>
 #include <stdio.h>
 
+
+struct Node {
+    void* content; // To store different data-types
+    struct Node* next;
+    struct Node* prev;
+};
+
 struct List{
 	 struct Node* head;
 	 struct Node* tail;
 	 int size;
-	 void (*print_function)(void*);
-	 void (*free_function)(void*);
-};
+	 // The user of this list can inform the print and free functions
+	 void (* print_function)(void *); // Each type of data can have different forms of printing
+	 void (* free_function) (void *); // and different forms of deallocation (free)
 
-
-struct Node {
-    void* content;
-    struct Node* next;
-    struct Node* prev;
 };
 
 struct List* list_create(void (*print_function)(void*), void (*free_function)(void*)){
@@ -36,7 +42,6 @@ struct Node * list_create_node(void* content){
 	new_node->content = content;
 	return new_node;
 }
-
 
 
 void list_insert_node_head(struct List * list, struct Node * x) {

@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "../db_buffer.h"
+#include "../../db_config.h"
 
 void insert_MRU(struct List * list, struct Node * node);
 struct Node * remove_LRU(struct List * list);
@@ -29,7 +30,7 @@ void buffer_policy_start(){
 
 struct Page * buffer_request_page(int file_id, long block_id, char operation){
 
-	//it is mandatory to call this two functions (buffer_find_page, buffer_computes_request_statistics)
+	// It is mandatory to call this two functions (buffer_find_page, buffer_computes_request_statistics)
 	//--------------------------------------------------------
 	struct Page * page = buffer_find_page(file_id, block_id);
 	buffer_computes_request_statistics(page, operation);
@@ -39,26 +40,26 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 
 		move_to_MRU(list, page);
 
-	} else { //MISS - page is not in Buffer (struct Page * page == NULL)
+	} else { // MISS - page is not in Buffer (struct Page * page == NULL)
 
 		if (buffer_is_full() == FALSE) {
 
 			page = buffer_get_free_page();
 			struct Node * new_node = list_create_node(page);
-			buffer_load_page(file_id, block_id, page); //Read the data from storage media
+			buffer_load_page(file_id, block_id, page); // Read the data from storage media
 			insert_MRU(list, new_node);
 
-		} else { //need a replacement
+		} else { // Need a replacement
 
 			printf("\n ---- REPLACEMENT ------ ");
 			struct Node * lru_node = remove_LRU(list);
 			struct Page * victim = lru_node->content; //Get the LRU Page
 
-			buffer_flush_page(victim); //Flush the data to the secondary storage media if is dirty
+			buffer_flush_page(victim); // Flush the data to the secondary storage media if is dirty
 
-			page = buffer_reset_page(victim); //To avoid malloc a new page we reuse the victim page
+			page = buffer_reset_page(victim); // To avoid malloc a new page we reuse the victim page
 
-			buffer_load_page(file_id, block_id, page); //Read new data from storage media
+			buffer_load_page(file_id, block_id, page); // Read new data from storage media
 			insert_MRU(list, lru_node);
 
 		}
