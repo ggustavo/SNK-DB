@@ -4,8 +4,8 @@
 // -----> Buffer Manager Setting --------------------------------------------------------------
 // --------------------------------------------------------------------------------------------
 // ###################################################################
-#define BLOCK_SIZE  100   // Sets the size of the block accessed on the secondary storage media
-#define BUFFER_SIZE 5    // Sets the number of pages resident in the buffer.
+int BLOCK_SIZE  = 100;   // Sets the size of the block accessed on the secondary storage media
+int BUFFER_SIZE = 5;    // Sets the number of pages resident in the buffer.
 //###################################################################
 //--------------------------------------------------------------------------------------------
 

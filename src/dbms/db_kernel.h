@@ -10,8 +10,10 @@
 #include "db_config.h"
 
 #include "buffer_manager/policies/LRU.h"
+#include "file_manager/catalog.h"
 
 void start_database(){
+	catalog_start();
 	buffer_start();
 	buffer_policy_start();
 }

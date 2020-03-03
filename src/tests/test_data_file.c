@@ -5,7 +5,7 @@
 #include "../dbms/db_kernel.h"
 #include "../dbms/file_manager/data_file.h"
 #include "../dbms/file_manager/block_header.h"
-
+#include "../dbms/util/db_strings.h"
 
 void export(struct BlockHeader * header, int index, char * tuple, int tuple_size){
 	printf("\n ----> %d :: %s", tuple_size, tuple);
@@ -13,6 +13,7 @@ void export(struct BlockHeader * header, int index, char * tuple, int tuple_size
 
 
 int main(void) {
+
 	start_database();
 
 	//File Data: (with BLOCK_SIZE = 8 and BUFFER_SIZE = 5)
