@@ -59,16 +59,18 @@ float handler_read_float(char * data, unsigned long offset) {
 // ------- STRING ---------------------------------------------------
 //###################################################################
 void handler_write_string(char * data, char * string, int string_size, unsigned long offset){
-	for(int i = 0; i < string_size; i++){ // <---------- look for a more efficient method
-		data[offset + i] = string[i];
-	}
+	memcpy(data + offset, string, string_size);
+	//for(int i = 0; i < string_size; i++){ // <---------- look for a more efficient method
+	//	data[offset + i] = string[i];
+	//}
 }
 
 char * handler_read_string(char * data, int string_size, unsigned long offset){
 	char * string = (char *) malloc(sizeof(string_size));
-	for(int i = 0; i < string_size; i++){ // <---------- look for a more efficient method
-		string[i] = data[offset + i];
-	}
+	memcpy(string, data + offset, string_size);
+	//for(int i = 0; i < string_size; i++){ // <---------- look for a more efficient method
+		//string[i] = data[offset + i];
+	//}
 	return string;
 }
 //###################################################################

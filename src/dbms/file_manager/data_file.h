@@ -24,6 +24,14 @@ struct DataFile{
 };
 
 
+void data_file_print(struct DataFile * data_file){
+	printf("\n---------------------------------------------------------------------------------------------------");
+	printf("\nData File - Name: %s", data_file->name);
+	printf("\nData File - Directory: %s", data_file->directory_path);
+	printf("\nData File - Number of Blocks: %d", data_file->number_of_blocks);
+	printf("\n---------------------------------------------------------------------------------------------------");
+}
+
 struct DataFile * data_file_load_meta(struct DataFile * data_file){ //TODO <---
 
 	data_file->number_of_blocks = file_size(data_file->file_id) / BLOCK_SIZE;
@@ -142,7 +150,7 @@ int data_file_write_new_tuple(struct DataFile * data_file, char * tuple, int tup
 		int result = data_file_write_tuple_in_block(temp_header, page->data, tuple, tuple_size);
 
 		if(result == ERROR_BLOCK_IS_FULL){
-			printf("\nBLOCK FULL!");
+			//printf("\nBLOCK FULL!");
 			data_file->number_of_blocks  = data_file->number_of_blocks + 1; //increment to create a new block
 
 			header_reset(temp_header);

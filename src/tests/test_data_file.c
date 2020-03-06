@@ -17,18 +17,18 @@ int main(void) {
 
 
 	struct DataFile * data_file = data_file_open("users","Debug");
+	data_file_print(data_file);
 
 
-	data_file_write_new_tuple( data_file, "Tuple-00\0", 9);
-	/*
 	data_file_write_new_tuple( data_file, "Tuple-00\0", 9);
 	data_file_write_new_tuple( data_file, "Tuple-01\0", 9);
 	data_file_write_new_tuple( data_file, "Tuple-02\0", 9);
 	data_file_write_new_tuple( data_file, "Tuple-03\0", 9);
 	data_file_write_new_tuple( data_file, "Tuple-04\0", 9);
 	data_file_write_new_tuple( data_file, "Tuple-05\0", 9);
-	data_file_write_new_tuple( data_file, "Tuple-06\0", 9);
-	*/
+
+	data_file_write_new_tuple( data_file, "Tuple-06\0", 9); //<--- block full!
+
 
 	data_file_scan(data_file, print_tuples);
 
