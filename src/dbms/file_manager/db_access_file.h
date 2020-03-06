@@ -25,15 +25,20 @@ void file_close(int file_descriptor){
 	close(file_descriptor);
 }
 
+int file_size(int file_descriptor){
+	return lseek(file_descriptor, 0, 2); //2 = SEEK_END
+}
+
+
 void file_read(int file_descriptor, long block_id, char * frame, int block_size){
-	lseek(file_descriptor, block_id * block_size, 0);
+	lseek(file_descriptor, block_id * block_size, 0); //0 = SEEK_SET
 	if( read(file_descriptor, frame, block_size) == -1 ){
 		printf("\n[ERR0] Read Page %d-%ld",file_descriptor,block_id);
 	}
 }
 
 void file_write(int file_descriptor, long block_id, char * frame, int block_size){
-	lseek(file_descriptor, block_id * block_size, 0);
+	lseek(file_descriptor, block_id * block_size, 0); //0 = SEEK_SET
 	if( write(file_descriptor, frame, block_size) == -1){
 		printf("\n[ERR0] Write Page %d-%ld",file_descriptor,block_id);
 	}

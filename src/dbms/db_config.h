@@ -10,6 +10,15 @@ int BUFFER_SIZE = 5;    // Sets the number of pages resident in the buffer.
 //--------------------------------------------------------------------------------------------
 
 
+// -----> Catalog Setting --------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
+// ###################################################################
+char CATALOG_DATA_FOLDER[]    = "data";
+char CATALOG_SCHEMAS_FOLDER[] = "data/schemas";
+//###################################################################
+//--------------------------------------------------------------------------------------------
+
+
 // -----> Block Header Settings ---------------------------------------------------------------
 // ############################################################################################
 #define OFFSET_BLOCK_ID 0            //  [00 byte to 03 byte]
@@ -35,7 +44,7 @@ int BUFFER_SIZE = 5;    // Sets the number of pages resident in the buffer.
  * STATUS_LOCKED -> When the query processor is performing an operation on the page (reading or writing),
  * otherwise: STATUS_UNLOCKED
  */
-#define PAGE_STATUS_LOCKED 'L'
+#define PAGE_STATUS_LOCKED   'L'
 #define PAGE_STATUS_UNLOCKED 'U'
 
 /*
@@ -49,9 +58,10 @@ int BUFFER_SIZE = 5;    // Sets the number of pages resident in the buffer.
  * The Query Processor indicates that it needs to READ or WRITE when requesting a page.
  */
 #define WRITE_REQUEST 'W'
-#define READ_REQUEST 'R'
+#define READ_REQUEST  'R'
 // ############################################################################################
 // --------------------------------------------------------------------------------------------
+
 
 
 // -----> Errors and Returns ------------------------------------------------------------------
@@ -59,8 +69,13 @@ int BUFFER_SIZE = 5;    // Sets the number of pages resident in the buffer.
 #define ERROR_BLOCK_IS_FULL -1
 #define SUCCESS_WRITE_TUPLE 2
 #define ERROR_TUPLE_GREATER_THAN_BLOCK_SIZE -3
+
+#define CREATED 'C'
+#define OPENED  'O'
 // ############################################################################################
 // --------------------------------------------------------------------------------------------
 
+#include <stdio.h>
+#include <stdlib.h>
 
 #endif

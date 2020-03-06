@@ -107,6 +107,8 @@ void buffer_start() {
 
 }
 
+
+
 /*
  * This function needs to be optimized for a hash table or something faster than a sequential search.
  */
@@ -132,6 +134,17 @@ struct Page * buffer_flush_page(struct Page * target){
 		return target;
 	}
 	printf("\n[ERR0] Flush Page NULL");
+	return NULL;
+}
+
+/*
+ * Flush all pages to secondary storage media.
+ */
+struct Page * buffer_flush(){
+	for(int i = 0; i < BUFFER_SIZE; i++){
+		struct Page * page = &pages[i];
+		if(page->block_id >= 0) buffer_flush_page(page);
+	}
 	return NULL;
 }
 
@@ -239,7 +252,7 @@ void buffer_print_statistics(){ //%llu for Linux, %I64u for Windows
 	printf("\nOperations: %I64u ",operations);
 	printf("(hit: %I64u miss: %I64u) ", hit_operations, miss_operations);
 	printf("(write: %I64u read: %I64u)", write_operations, read_operations);
-	printf("\nloaded: %I64u flushed: %I64u", load_operations, flush_operations);
+	printf("\nI/O: (loaded: %I64u flushed: %I64u)", load_operations, flush_operations);
 	printf("\n---------------------------------------------------------------");
 }
 

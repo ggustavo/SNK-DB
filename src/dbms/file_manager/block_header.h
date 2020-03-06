@@ -45,6 +45,7 @@ struct BlockHeader{
 };
 
 
+
 struct BlockHeader * header_create(){
 	struct BlockHeader * header = (struct BlockHeader *) malloc(sizeof(struct BlockHeader));
 	header->block_id =           -1;
@@ -54,13 +55,22 @@ struct BlockHeader * header_create(){
 	header->tuple_index_size =    0;
 
 	return header;
+}
 
+struct BlockHeader * header_reset(struct BlockHeader * header){
+	header->block_id =           -1;
+	header->used_size =           0;
+	header->lsn =                -1;
+	header->status =             -1;
+	header->tuple_index_size =    0;
+
+	return header;
 }
 
 /*
  * Read char * data content block header and returns in a structure format (struct BlockHeader).
  */
-struct BlockHeader * header_read(struct BlockHeader * header, char * data){
+struct BlockHeader * header_read_from_page(struct BlockHeader * header, char * data){
 	header->block_id =                 handler_read_int(data, OFFSET_BLOCK_ID);
 	header->used_size =                handler_read_int(data, OFFSET_USED_SIZE);
 	header->lsn =    			       handler_read_int(data, OFFSET_LSN);
@@ -74,7 +84,7 @@ struct BlockHeader * header_read(struct BlockHeader * header, char * data){
  * Write struct BlockHeader content in data block.
  */
 
-struct BlockHeader* header_write(struct BlockHeader * header, char * data) {
+struct BlockHeader* header_write_to_page(struct BlockHeader * header, char * data) {
 	handler_write_int(data, header->block_id,          OFFSET_BLOCK_ID);
 	handler_write_int(data, header->used_size,         OFFSET_USED_SIZE);
 	handler_write_int(data, header->lsn,               OFFSET_LSN);
@@ -96,5 +106,9 @@ void header_print(struct BlockHeader * header){
 	printf("\n--------------------------------------");
 }
 
+
+void header_free(struct BlockHeader * header){
+	free(header);
+}
 
 #endif
