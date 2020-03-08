@@ -169,6 +169,7 @@ int data_file_write_new_tuple(struct DataFile * data_file, char * tuple, int tup
 	return SUCCESS_WRITE_TUPLE;
 }
 
+/*
 char * read_tuple(struct DataFile * data_file, int block_id, int tuple_id){
 
 	return NULL;
@@ -182,7 +183,7 @@ int data_file_write_delete_tuple(){ //TODO
 
 	return SUCCESS_WRITE_TUPLE;
 }
-
+*/
 
 void data_file_read_all_tuples_in_block_e(struct BlockHeader * header, char * data, void (*export_function)(struct BlockHeader*, int, char*, int)){
 	char * tuple = NULL;

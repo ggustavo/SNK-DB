@@ -36,8 +36,8 @@ int main(void) {
 	buffer_flush();
 	buffer_print_statistics();
 
-	//printf("\nPress Any Key to Continue\n");
-	//getchar();
+	printf("\nPress Any Key to Exit\n");
+	getchar();
 	return 0;
 }
 

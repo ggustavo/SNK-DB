@@ -1,2 +1,6 @@
 Debug
 Release
+.settings
+.cproject
+.project
+.settings
