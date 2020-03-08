@@ -6,6 +6,7 @@
 #include <strings.h>
 #include <stdarg.h> //for use va_list
 #include "../db_config.h"
+#include <sys/stat.h> //for us mkdir
 
 
 int catalog_access_directory(char * path){

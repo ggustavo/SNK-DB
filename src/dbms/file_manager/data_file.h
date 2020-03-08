@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../buffer_manager/policies/LRU.h"
 #include "../file_manager/block_header.h"
 #include "../file_manager/db_access_file.h"
 #include "../file_manager/data_handle.h"

@@ -1,5 +1,5 @@
 /*
- * Least Recently Used (LRU)
+ * First In, First Out (FIFO)
  *
  * Use this algorithm to develop new page replacement policies.
  *
@@ -40,9 +40,9 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 	buffer_computes_request_statistics(page, operation);
 	//--------------------------------------------------------
 
-	if(page != NULL){ //HIT - Update MRU
+	if(page != NULL){ //HIT - DO NOTHING !!!
 
-		move_to_MRU(list, page);
+	
 
 	} else { // MISS - page is not in Buffer (struct Page * page == NULL)
 

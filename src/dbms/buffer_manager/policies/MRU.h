@@ -1,5 +1,5 @@
 /*
- * Least Recently Used (LRU)
+ * Most Recently Used (MRU)
  *
  * Use this algorithm to develop new page replacement policies.
  *
@@ -13,7 +13,7 @@
 #include "../../db_config.h"
 
 void insert_MRU(struct List * list, struct Node * node);
-struct Node * remove_LRU(struct List * list);
+struct Node * remove_MRU(struct List * list);
 void move_to_MRU(struct List * list, struct Page * page);
 
 
@@ -56,15 +56,15 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 		} else { // Need a replacement
 
 			printf("\n ---- REPLACEMENT ------ ");
-			struct Node * lru_node = remove_LRU(list);
-			struct Page * victim = (struct Page *) lru_node->content; //Get the LRU Page
+			struct Node * mru_node = remove_MRU(list);
+			struct Page * victim = (struct Page *) mru_node->content; //Get the MRU Page
 
 			buffer_flush_page(victim); // Flush the data to the secondary storage media if is dirty
 
 			page = buffer_reset_page(victim); // To avoid malloc a new page we reuse the victim page
 
 			buffer_load_page(file_id, block_id, page); // Read new data from storage media
-			insert_MRU(list, lru_node);
+			insert_MRU(list, mru_node);
 
 		}
 
@@ -78,8 +78,8 @@ void insert_MRU(struct List * list, struct Node * node){
 	((struct Page*)node->content)->extended_attributes = node;
 }
 
-struct  Node * remove_LRU(struct List * list){
-	return list_remove_tail(list);
+struct  Node * remove_MRU(struct List * list){
+	return list_remove_head(list);
 }
 
 void move_to_MRU(struct List * list, struct Page * page){

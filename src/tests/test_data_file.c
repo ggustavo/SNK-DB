@@ -16,7 +16,7 @@ int main(void) {
 	start_database();
 
 
-	struct DataFile * data_file = data_file_open("users","Debug");
+	struct DataFile * data_file = data_file_open("users", CATALOG_DATA_FOLDER);
 	data_file_print(data_file);
 
 
