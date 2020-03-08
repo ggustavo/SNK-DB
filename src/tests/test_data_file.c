@@ -11,6 +11,7 @@ void print_tuples(struct BlockHeader * header, int tuple_id, char * tuple, int t
 }
 
 
+
 int main(void) {
 
 	start_database();
