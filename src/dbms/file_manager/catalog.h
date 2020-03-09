@@ -6,8 +6,9 @@
 #include <string.h>
 #include <stdarg.h> //for use va_list
 #include "../db_config.h"
-#include <sys/stat.h>   //for use mkdir
-#include <sys/types.h> //for use mkdir
+#include <sys/stat.h>   //for use mkdi?
+#include <sys/types.h> //for use mkdi?
+#include <io.h>       //for use mkdir?
 
 
 int catalog_access_directory(char * path){
