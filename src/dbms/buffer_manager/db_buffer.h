@@ -100,9 +100,9 @@ void buffer_start() {
 	//printf("\nBuffer - Size of C Pointers: %d bytes", sizeof(void*));
 	printf("\nBuffer - Number of Pages: %d", BUFFER_SIZE);
 	printf("\nBuffer - Size of Block: %d bytes", BLOCK_SIZE);
-	printf("\nBuffer - Size of Page (without data): %d bytes",sizeof(struct Page) );
+	printf("\nBuffer - Size of Page (without data): %ld bytes",sizeof(struct Page) );
 	printf("\nBuffer - Data Allocated Memory ( Size of Block * Number of Pages ): %d bytes",(BUFFER_SIZE * BLOCK_SIZE));
-	printf("\nBuffer - Total ( [Size of Page + Size of Block] * Number of Pages ): %d bytes",( sizeof(struct Page) + BLOCK_SIZE) * BUFFER_SIZE);
+	printf("\nBuffer - Total ( [Size of Page + Size of Block] * Number of Pages ): %ld bytes",( sizeof(struct Page) + BLOCK_SIZE) * BUFFER_SIZE);
 	printf("\n---------------------------------------------------------------------------------------------------");
 
 }
@@ -249,11 +249,11 @@ void buffer_print_page_complete(void * data){
 
 void buffer_print_statistics(){ //%llu for Linux, %I64u for Windows
 	printf("\n-------------------Buffer Statistics---------------------------");
-	printf("\nOperations: %I64u ",operations);
-	printf("(hit: %I64u miss: %I64u) ", hit_operations, miss_operations);
-	printf("(write: %I64u read: %I64u)", write_operations, read_operations);
-	printf("\nI/O: (loaded: %I64u flushed: %I64u)", load_operations, flush_operations);
-	printf("\n---------------------------------------------------------------");
+	printf("\nOperations: %lld ",operations);
+	printf("(hit: %lld miss: %lld) ", hit_operations, miss_operations);
+	printf("(write: %lld read: %lld)", write_operations, read_operations);
+	printf("\nI/O: (loaded: %lld flushed: %lld)", load_operations, flush_operations);
+	printf("\n---------------------------------------------------------------\n");
 }
 
 /* Examples using pointers

@@ -11,10 +11,10 @@
 #include <sys/file.h>  // To Open
 #include <sys/types.h> // To Read and Write
 #include <unistd.h>    // To Close
-
+#include <fcntl.h>     // To Open
 
 int file_open(char * path) {
-	int file = open(path, 0x0100 | 2 , 0777); // O_CREAT | O_RDWR
+	int file = open(path,  O_RDWR | O_CREAT, 0777); // O_CREAT | O_RDWR
 	if (file == -1) {
 		perror(path);
 	}

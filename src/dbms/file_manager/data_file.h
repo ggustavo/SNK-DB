@@ -45,7 +45,6 @@ struct DataFile * data_file_create_meta(struct DataFile * data_file){ //TODO <--
 
 
 struct DataFile * data_file_open(char * name, char * path){
-
 	char * directory_path = catalog_append_path(3, path, "/", name );
 	char * file_path      = catalog_append_path(6, path, "/", name , "/", name, ".data" );
 	char * meta_file_path = catalog_append_path(6, path, "/", name , "/", name, ".meta" );

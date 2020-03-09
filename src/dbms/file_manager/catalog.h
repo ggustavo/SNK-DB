@@ -4,20 +4,22 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdarg.h> //for use va_list
+#include <stdarg.h> //to use va_list
 #include "../db_config.h"
-#include <sys/stat.h>   //for use mkdi?
-#include <sys/types.h> //for use mkdi?
-#include <io.h>       //for use mkdir?
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+//#include <io.h>       //to use mkdir? windows?
 
 
 int catalog_access_directory(char * path){
-	int dir = mkdir(path); //mkdir(path, 0777); S_IRWXU
+	// int dir = mkdir(path);  <----- windows?
+	int dir = mkdir(path, 0777);
 	if(dir == 0 ){
-		printf("\nCatalog - [CREATE] %s", path );
+		printf("\nCatalog - [CREATE %d] %s",dir, path );
 		return CREATED;
 	}else{
-		printf("\nCatalog - [OPEN] %s", path );
+		printf("\nCatalog - [OPEN %d] %s", dir, path );
 		return OPENED;
 	}
 	return dir;
