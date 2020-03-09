@@ -100,9 +100,9 @@ void buffer_start() {
 	//printf("\nBuffer - Size of C Pointers: %d bytes", sizeof(void*));
 	printf("\nBuffer - Number of Pages: %d", BUFFER_SIZE);
 	printf("\nBuffer - Size of Block: %d bytes", BLOCK_SIZE);
-	printf("\nBuffer - Size of Page (without data): %I64u bytes",sizeof(struct Page) );
+	printf("\nBuffer - Size of Page (without data): %d bytes",sizeof(struct Page) );
 	printf("\nBuffer - Data Allocated Memory ( Size of Block * Number of Pages ): %d bytes",(BUFFER_SIZE * BLOCK_SIZE));
-	printf("\nBuffer - Total ( [Size of Page + Size of Block] * Number of Pages ): %I64u bytes",( sizeof(struct Page) + BLOCK_SIZE) * BUFFER_SIZE);
+	printf("\nBuffer - Total ( [Size of Page + Size of Block] * Number of Pages ): %d bytes",( sizeof(struct Page) + BLOCK_SIZE) * BUFFER_SIZE);
 	printf("\n---------------------------------------------------------------------------------------------------");
 
 }

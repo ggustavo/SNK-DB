@@ -3,14 +3,15 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include <stdarg.h> //for use va_list
 #include "../db_config.h"
-#include <sys/stat.h> //for us mkdir
+#include <sys/stat.h>   //for use mkdir
+#include <sys/types.h> //for use mkdir
 
 
 int catalog_access_directory(char * path){
-	int dir = mkdir(path); //mkdir(path, 0777);
+	int dir = mkdir(path); //mkdir(path, 0777); S_IRWXU
 	if(dir == 0 ){
 		printf("\nCatalog - [CREATE] %s", path );
 		return CREATED;

@@ -1,7 +1,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <strings.h>
 
 #include "../dbms/db_kernel.h"
 #include "../dbms/file_manager/data_file.h"
@@ -37,8 +36,8 @@ int main(void) {
 	buffer_flush();
 	buffer_print_statistics();
 
-	printf("\nPress Any Key to Exit\n");
-	getchar();
+	//printf("\nPress Any Key to Exit\n");
+	//getchar();
 	return 0;
 }
 
