@@ -16,7 +16,7 @@ git clone https://github.com/ggustavo/SNK-DB.git
 
 ```properties
 cd SNK-DB
-gcc src/tests/test_data_file.c -o database -Wall -Wextra 
+gcc src/tests/test_buffer_requests.c -o database -Wall -Wextra
 ```  
 > **Note:** Use -Wall and -Wextra to show warnings 
 
