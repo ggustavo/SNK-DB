@@ -8,11 +8,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+struct List;
 
 struct Node {
     void* content; // To store different data-types
     struct Node* next;
     struct Node* prev;
+    struct List* list;
 };
 
 struct List{
@@ -40,6 +42,7 @@ struct Node * list_create_node(void* content){
 	new_node->next = NULL;
 	new_node->prev = NULL;
 	new_node->content = content;
+    new_node->list = NULL;
 	return new_node;
 }
 
@@ -56,6 +59,7 @@ void list_insert_node_head(struct List * list, struct Node * x) {
 		list->head = x;
 	}
 	list->size++;
+    x->list = list;
 }
 
 void list_insert_head(struct List * list, void *content) {
@@ -75,6 +79,7 @@ void list_insert_node_tail(struct List * list, struct Node * x) {
 		list->tail = x;
 	}
 	list->size++;
+    x->list = list;
 }
 
 void list_insert_tail(struct List *list, void * content) {
@@ -99,6 +104,7 @@ struct Node * list_remove(struct List * list, struct Node*x) {
 		list->size--;
 		x->next = NULL;
 		x->prev = NULL;
+        x->list = NULL;
 	}
 	return x;
 }
@@ -149,8 +155,8 @@ static void list_free_node(struct List* list, struct Node * x){
 		list->free_function(x->content);
 	}
 	x->content = NULL;
+    x->list = NULL;
 	free(x);
 }
-
 
 #endif
