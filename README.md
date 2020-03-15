@@ -1,7 +1,6 @@
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/ggustavo/SNK-DB) 
-
-
 # SNK Database
+
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/ggustavo/SNK-DB) 
 
 A simple file engine to study techniques to develop database management systems.
 [Project Activities](https://github.com/ggustavo/SNK-DB/projects/1?fullscreen=true)
@@ -13,7 +12,7 @@ Clone the project or [download](https://github.com/ggustavo/SNK-DB/archive/maste
 ```shell
 git clone https://github.com/ggustavo/SNK-DB.git
 ```
-
+> **Note:** I strongly recommend using the gitpod platform [gitpod platform](https://gitpod.io/#https://github.com/ggustavo/SNK-DB)
 #### Use GCC to compile
 
 ```properties
