@@ -13,9 +13,9 @@
 /*
 * These conditional macros choose the Page Replacement Policy
 *
-* You can choose a policy by adding the macro: "#define POLICY_NAME POLICY_NAME"
+* You can choose a policy by adding the macro: "#define POLICY_NAME TRUE"
 * for example:
-*				#define MRU MRU // <----- Choose the MRU
+*				#define MRU TRUE // <----- Choose the MRU
 *		
 *				#if LRU
 *					....   //<----- ignored
@@ -35,12 +35,15 @@
 * 				#elif POLICY_NAME
 					#include "buffer_manager/policies/POLICY_NAME.h"
 */
+
 #ifdef LRU
 	#include "buffer_manager/policies/LRU.h"	
 #elif MRU
 	#include "buffer_manager/policies/MRU.h"
 #elif FIFO
 	#include "buffer_manager/policies/FIFO.h"
+#elif ARC
+	#include "buffer_manager/policies/ARC.h"
 
 #else // If no policy has been chosen. Use LRU as default
 	#include "buffer_manager/policies/LRU.h"

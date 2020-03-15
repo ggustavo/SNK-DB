@@ -1,5 +1,6 @@
 /*
  * ARC - Adaptive Replacement Cache 
+ * CAUTION - THIS VERSION REQUIRES MORE TESTS
  */
 #ifndef POLICY_H_INCLUDED
 #define POLICY_H_INCLUDED
@@ -20,13 +21,19 @@ struct List * G1; //Ghost List
 struct List * G2; //Ghost List
 
 int P; // Policy Advisor
-
-
-                                                        
+                                           
 struct Ghost_Page{ // Ghost page does not store any page data only its metadata
     int file_id;
-    int block_id;
+    long block_id;
 };
+
+
+struct Node * replacement(int x_E_G2, struct Node * ghost_node);
+struct Ghost_Page * create_ghost_page();
+void insert_MRU(struct List * list, struct Node * node);
+struct Node * remove_LRU(struct List * list);
+void move_to_MRU(struct List * source, struct Node * node, struct List * target);
+struct Node * find_ghost_page(struct List * list, int file_id, int block_id);
 
 
 /*
@@ -42,7 +49,7 @@ void buffer_policy_start(){
     G2 = list_create(NULL,NULL);
     P = BUFFER_SIZE / 2;
     
-    printf("\nBuffer Replacement Policy: %s initial Advisor: %d", __FILE__, P);
+    printf("\nBuffer Replacement Policy: %s \ninitial Advisor: %d", __FILE__, P);
     printf("\n---------------------------------------------------------------------------------------------------");
 
 }
@@ -51,7 +58,7 @@ int L1(){
     return G1->size + T1->size;
 }
 
-int L2{
+int L2(){
     return G2->size + T2->size;
 }
 
@@ -80,12 +87,11 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 
 	} else { // MISS - page is not in Buffer (struct Page * page == NULL)
 
-       
         struct Node * ghost_node = NULL;
         struct Node * victim = NULL;
         // It is possible to have a page in G1 or G2
         
-        ghost_node = find_ghost_page(G1, page->file_id, page->block_id);
+        ghost_node = find_ghost_page(G1, file_id, block_id);
         
         if(ghost_node != NULL){ // Ghost HIT int G1
            
@@ -101,8 +107,8 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             return page;
     
         }
-
-        ghost_node = find_ghost_page(G2, page->file_id, page->block_id);
+    
+        ghost_node = find_ghost_page(G2, file_id, block_id);
         if(ghost_node != NULL){ // Ghost HIT int G2
             
             P = MAX( BUFFER_SIZE, P - MAX( SAFE_DIVISION( G1->size, G2->size), 1) ); // Adapt p = max{ 0, p - max{ B1.size/B2.size, 1} }
@@ -117,7 +123,6 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             return page;
         
         }
-
 
 		if (buffer_is_full() == FALSE) {
 
@@ -135,6 +140,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
                     ghost_node = remove_LRU(G1);
                     victim = replacement(0, ghost_node); 
                 }else{ //delete LRU page of T1 and remove it from the cache.
+                    
                     victim = remove_LRU(T1);
                     page = (struct Page*) victim->content;
 			        buffer_flush_page(page);
@@ -195,11 +201,12 @@ struct Ghost_Page * create_ghost_page(){
 }
 
 void insert_MRU(struct List * list, struct Node * node){
+    ((struct Page*)node->content)->extended_attributes = node;
 	list_insert_node_head(list,node);
 }
 
 struct Node * remove_LRU(struct List * list){
-    return (struct Node *) list_remove_tail(list)->content;
+    return list_remove_tail(list);
 }
 
 void move_to_MRU(struct List * source,struct Node * node, struct List * target){
@@ -208,7 +215,7 @@ void move_to_MRU(struct List * source,struct Node * node, struct List * target){
 }
 
 
-struct Node * find_ghost_page(List * list, int file_id, int block_id){
+struct Node * find_ghost_page(struct List * list, int file_id, int block_id){
     struct Node * x = list->head;
         while(x != NULL){
             struct Ghost_Page * ghost = (struct Ghost_Page *) x->content;
@@ -217,8 +224,44 @@ struct Node * find_ghost_page(List * list, int file_id, int block_id){
             }
             x = x->next;
         }
-        return NULL;
+    return NULL;
 }
 
+void print_arc(){
+    struct Node * x = G1->tail;
+    printf("\n<-");
+    while(x!=NULL){
+        struct Ghost_Page * page = (struct Ghost_Page *) x->content;
+        printf(" [%d-%ld]", page->file_id, page->block_id);
+        x = x->prev;
+    }
+    printf(" ->");
+    x = T1->tail;
+    printf(" <-");
+    while(x!=NULL){
+        struct Page * page = (struct Page *) x->content;
+        printf(" [%d-%ld]", page->file_id, page->block_id);
+        x = x->prev;
+    }
+    printf(" ->");
+    x = T2->head;
+    printf(" <-");
+    while(x!=NULL){
+        struct Page * page = (struct Page *) x->content;
+        printf(" [%d-%ld]", page->file_id, page->block_id);
+        x = x->next;
+    }
+    printf(" ->");
+    x = G2->head;
+    printf(" <-");
+    while(x!=NULL){
+        struct Ghost_Page * page = (struct Ghost_Page *) x->content;
+        printf(" [%d-%ld]", page->file_id, page->block_id);
+        x = x->next;
+    }
+    printf(" ->");
+
+
+}
 
 #endif

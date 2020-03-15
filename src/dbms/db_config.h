@@ -39,10 +39,10 @@ char CATALOG_SCHEMAS_FOLDER[] = "data/schemas";
 
 
 
-// -----> Definitions of System ---------------------------------------------------------------
+// -----> System Definitions ------------------------------------------------------------------
 // ############################################################################################
-#define FALSE '0'
-#define  TRUE '1'
+#define FALSE 0
+#define  TRUE 1
 
 /*
  * STATUS_LOCKED -> When the query processor is performing an operation on the page (reading or writing),
