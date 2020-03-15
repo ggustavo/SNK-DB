@@ -9,12 +9,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-//#include <io.h>       //to use mkdir? windows?
-
 
 int catalog_access_directory(char * path){
-	// int dir = mkdir(path);  <----- windows?
-	int dir = mkdir(path, 0777);
+	 int dir = xmkdir(path);  
+	//int dir = mkdir(path, 0777);
 	if(dir == 0 ){
 		printf("\nCatalog - [CREATE %d] %s",dir, path );
 		return CREATED;
