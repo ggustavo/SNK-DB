@@ -12,7 +12,7 @@ Clone the project or [download](https://github.com/ggustavo/SNK-DB/archive/maste
 ```shell
 git clone https://github.com/ggustavo/SNK-DB.git
 ```
-> **Note:** I strongly recommend using the gitpod platform [gitpod platform](https://gitpod.io/#https://github.com/ggustavo/SNK-DB)
+> **Note:** I strongly recommend using the [gitpod platform](https://gitpod.io/#https://github.com/ggustavo/SNK-DB)
 #### Use GCC to compile
 
 ```properties
