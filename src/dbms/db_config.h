@@ -88,7 +88,7 @@ char CATALOG_SCHEMAS_FOLDER[] = "data/schemas";
 	#include <io.h>       //to use mkdir? windows?
 	#define xmkdir(path) mkdir(path); // <----- windows?
 #else
-	#define xmkdir(path) mkdir(path, 0777);
+	#define xmkdir(path) mkdir(path, 0777); //-DWIN to compile on Windows (warning: is not stable)
 #endif
 
 #endif
