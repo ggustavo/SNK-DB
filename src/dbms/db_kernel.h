@@ -42,6 +42,8 @@
 	#include "buffer_manager/policies/MRU.h"
 #elif FIFO
 	#include "buffer_manager/policies/FIFO.h"
+#elif CLOCK
+	#include "buffer_manager/policies/CLOCK.h"
 #elif ARC
 	#include "buffer_manager/policies/ARC.h"
 
