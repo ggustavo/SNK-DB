@@ -1,7 +1,5 @@
 /*
- * Least Recently Used (LRU)
- *
- * Use this algorithm to develop new page replacement policies.
+ * Second Chance (or Clock)
  *
  */
 #ifndef POLICY_H_INCLUDED
