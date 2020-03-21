@@ -1,5 +1,5 @@
 /*
- * ARC - Adaptive Replacement Cache 
+ * Adaptive Replacement Cache (ARC) 
  * CAUTION - THIS VERSION REQUIRES MORE TESTS
  */
 #ifndef POLICY_H_INCLUDED

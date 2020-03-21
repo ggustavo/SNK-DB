@@ -44,6 +44,10 @@
 	#include "buffer_manager/policies/FIFO.h"
 #elif CLOCK
 	#include "buffer_manager/policies/CLOCK.h"
+#elif GCLOCK
+	#include "buffer_manager/policies/GCLOCK.h"
+#elif LFU
+	#include "buffer_manager/policies/LFU.h"
 #elif ARC
 	#include "buffer_manager/policies/ARC.h"
 
