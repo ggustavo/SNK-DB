@@ -41,6 +41,7 @@ gcc src/tests/test_buffer_requests.c -o database -Wall -Wextra
 |`-DLRU`  |Uses Least Recently Used (LRU)         |`gcc (...) -DLRU` |
 |`-DMRU`  |Uses Most Recently Used (MRU)          |`gcc (...) -DMRU` |
 |`-DFIFO` |Uses First In, First Out (FIFO)        |`gcc (...) -DFIFO` |
+|`-DCLOCK`|Uses Second Chance (or Clock)          |`gcc (...) -DCLOCK` |
 |`-DARC`  |Uses Adaptive Replacement Cache (ARC) ***(in test phase)***  |`gcc (...) -DARC` |
 
 > **Note:** Use [db_kernel.h](https://github.com/ggustavo/SNK-DB/blob/master/src/dbms/db_kernel.h). If you don't want to use these options
