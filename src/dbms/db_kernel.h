@@ -48,6 +48,8 @@
 	#include "buffer_manager/policies/GCLOCK.h"
 #elif LFU
 	#include "buffer_manager/policies/LFU.h"
+#elif LFUDA
+	#include "buffer_manager/policies/LFUDA.h"
 #elif ARC
 	#include "buffer_manager/policies/ARC.h"
 
