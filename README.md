@@ -42,6 +42,7 @@ gcc src/tests/test_buffer_requests.c -o database -Wall -Wextra
 |`-DMRU`   |Uses Most Recently Used (MRU)          |`gcc (...) -DMRU` |
 |`-DFIFO`  |Uses First In, First Out (FIFO)        |`gcc (...) -DFIFO` |
 |`-DLFU`   |Uses Least Frequently Used (LFU)       |`gcc (...) -DLFU` |
+|`-DLFUDA` |Uses Least Frequently Used with Dynamic Aging (LFU-DA)       |`gcc (...) -DLFUDA` |
 |`-DCLOCK` |Uses Second Chance (or Clock)          |`gcc (...) -DCLOCK` |
 |`-DGCLOCK`|Uses Generalized Clock (GCLOCK)        |`gcc (...) -DGCLOCK` |
 |`-DARC`   |Uses Adaptive Replacement Cache (ARC) ***(in test phase)***  |`gcc (...) -DARC` |
