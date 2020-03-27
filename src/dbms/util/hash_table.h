@@ -2,8 +2,8 @@
  * A basic implementation of a Static Hash Table
  */
 
-#ifndef SIMPLE_HASH
-#define SIMPLE_HASH
+#ifndef HASH_TABLE
+#define HASH_TABLE
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -36,32 +36,36 @@
 */
 
 struct Entity{
-    int key;
+    unsigned int key;
     void * value;
 };
 
 struct Hash{
     int number_of_buckets;
     struct List ** buckets;
-    int (*custom_hash_function)(struct Hash *,int);
     int size;
+    int number_of_collisions;
 };
 
 
-int simple_hash_function(struct Hash * hash, int key){
+unsigned int hash_table_create_key(const unsigned char *buf, int len) {
+    unsigned int hash = 5381;
+    while (len--)
+        hash = ((hash << 5) + hash) + (*buf++); /* hash * 33 + c */
+    return hash;
+}
+
+int hash_table_function(struct Hash * hash, unsigned int key){
     return key % hash->number_of_buckets;
 }
 
-struct Hash * simple_hash_create(int number_of_buckets, int (*custom_hash_function)(struct Hash *,int)){
+struct Hash * hash_table_create(int number_of_buckets){
     struct Hash * hash = (struct Hash*) malloc(sizeof(struct Hash));
     hash->number_of_buckets = number_of_buckets;
-
+    hash->number_of_collisions = 0;
+    hash->size = 0;
     hash->buckets = (struct List**) malloc (sizeof(struct List*) * number_of_buckets);
-    if(custom_hash_function == NULL){
-        hash->custom_hash_function = simple_hash_function;
-    }else{
-        hash->custom_hash_function = custom_hash_function;
-    }
+    
     for (int i = 0; i < number_of_buckets; i++) {
         hash->buckets[i] = NULL;
     }
@@ -69,7 +73,7 @@ struct Hash * simple_hash_create(int number_of_buckets, int (*custom_hash_functi
     return hash;
 }
 
-struct Entity * simple_hash_create_entity(int key, void * value){
+struct Entity * hash_table_create_entity(unsigned int key, void * value){
     struct Entity * entity = (struct Entity*) malloc (sizeof(struct Entity));
     entity->key = key;
     entity->value = value;
@@ -77,40 +81,43 @@ struct Entity * simple_hash_create_entity(int key, void * value){
 }
 
 
-void simple_hash_free_entity(struct Entity * entity){
+void hash_table_free_entity(struct Entity * entity){
     entity->value = NULL;
     free(entity);
 }
 
 /*
-* Warning: this function can create duplicate keys. Use the simple_hash_update() function to avoid this.
+* Warning: this function can create duplicate keys. Use the hash_table_update() function to avoid this.
 */
-void simple_hash_put(struct Hash * hash, int key, void* value){
-    int bucket_index = hash->custom_hash_function(hash, key);
+void hash_table_put(struct Hash * hash, unsigned int key, void* value){
+    int bucket_index = hash_table_function(hash, key);
     struct List * bucket = hash->buckets[ bucket_index ];
     if(bucket == NULL){
         bucket = hash->buckets[ bucket_index ] = list_create(NULL,NULL);
+    }else{
+        hash->number_of_collisions++;
     }
-    list_insert_tail(bucket, simple_hash_create_entity(key,value));
+    list_insert_tail(bucket, hash_table_create_entity(key,value));
     hash->size++;
 }
 
 /*
-* Creates a new entity if it does not exist.
+* Creates a new entity if it does not exist and return the previous entity if it exists
 */
-struct Entity * simple_hash_update(struct Hash * hash, int key, void* value){
-    int bucket_index = hash->custom_hash_function(hash, key);
+struct Entity * hash_table_update(struct Hash * hash, unsigned int key, void* value){
+    int bucket_index = hash_table_function(hash, key);
     struct List * bucket = hash->buckets[ bucket_index ];
     if(bucket == NULL){
         bucket = hash->buckets[ bucket_index ] = list_create(NULL,NULL);
-        list_insert_tail(bucket, simple_hash_create_entity(key,value));
+        list_insert_tail(bucket, hash_table_create_entity(key,value));
         hash->size++;
     }else{
+        hash->number_of_collisions++;
         struct Node * x = bucket->head;
 	    while(x != NULL){
 		    struct Entity * entity = (struct Entity *) x->content;
             if(entity->key == key){
-                x->content = simple_hash_create_entity(key, value);
+                x->content = hash_table_create_entity(key, value);
                 return entity; 
             } 
 		    x = x->next;
@@ -119,8 +126,8 @@ struct Entity * simple_hash_update(struct Hash * hash, int key, void* value){
     return NULL;
 }
 
-struct Entity * simple_hash_get(struct Hash * hash, int key){
-    int bucket_index = hash->custom_hash_function(hash, key);
+struct Entity * hash_table_get(struct Hash * hash, unsigned int key){
+    int bucket_index = hash_table_function(hash, key);
     struct List * bucket = hash->buckets[ bucket_index ];
     if(bucket == NULL) return NULL;
     struct Node * x = bucket->head;
@@ -132,8 +139,8 @@ struct Entity * simple_hash_get(struct Hash * hash, int key){
     return NULL;
 } 
 
-struct Entity * simple_hash_remove(struct Hash * hash, int key){
-    int bucket_index = hash->custom_hash_function(hash, key);
+struct Entity * hash_table_remove(struct Hash * hash, unsigned int key){
+    int bucket_index = hash_table_function(hash, key);
     struct List * bucket = hash->buckets[ bucket_index ];
     if(bucket == NULL) return NULL;
     struct Node * x = bucket->head;
@@ -154,7 +161,7 @@ struct Entity * simple_hash_remove(struct Hash * hash, int key){
 * Converts all entities in the hash to a struct List.
 * Return NULL if there is no entities.
 */
-struct List * simple_hash_to_list(struct Hash * hash){
+struct List * hash_table_to_list(struct Hash * hash){
     if(hash->size == 0){
         return NULL;
     }
@@ -174,7 +181,7 @@ struct List * simple_hash_to_list(struct Hash * hash){
 }
 
 
-void simple_hash_print( struct Hash * hash, int(*print_function)(int,void*)){
+void hash_table_print( struct Hash * hash, int(*print_function)(int,void*)){
     for (int i = 0; i < hash->number_of_buckets; i++) {
         struct List * bucket = hash->buckets[i];
         if(bucket!=NULL){
@@ -189,5 +196,27 @@ void simple_hash_print( struct Hash * hash, int(*print_function)(int,void*)){
     }
 }
 
+
+long hash_table_size_of(struct Hash * hash){
+    unsigned long long size = 0;
+    
+    size+= sizeof(struct Hash);
+    size+= sizeof(struct List*)   * hash->number_of_buckets;
+    size+= sizeof(struct List)    * hash->number_of_buckets;
+    size+= sizeof(struct Node)    * hash->size;
+    size+= sizeof(struct Entity)  * hash->size;
+    
+    printf("\nsize of struct Hash:   %d", sizeof(struct Hash));
+    printf("\nsize of struct Entity: %d", sizeof(struct Entity));
+    printf("\nsize of struct List:   %d", sizeof(struct List));
+    printf("\nsize of struct Node:   %d", sizeof(struct Node));
+    printf("\nnumber of buckets:     %d", hash->number_of_buckets);
+    printf("\nnumber of collisions:  %d", hash->number_of_collisions);
+    printf("\nnumber of elements:    %d", hash->size);
+    printf("\ntotal size (bytes):    %lu", size);
+
+    return size;
+    
+}
 
 #endif
