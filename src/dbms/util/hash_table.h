@@ -47,14 +47,6 @@ struct Hash{
     int number_of_collisions;
 };
 
-
-unsigned int hash_table_create_key(const unsigned char *buf, int len) {
-    unsigned int hash = 5381;
-    while (len--)
-        hash = ((hash << 5) + hash) + (*buf++); /* hash * 33 + c */
-    return hash;
-}
-
 int hash_table_function(struct Hash * hash, unsigned int key){
     return key % hash->number_of_buckets;
 }

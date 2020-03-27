@@ -1,7 +1,8 @@
 /*
 #include <stdio.h>
 #include <stdlib.h>
-#include "../dbms/util/simple_hash_table.h"
+#include "../dbms/util/hash_table.h"
+#include "../dbms/util/hash_functions.h"
 #include <time.h>
 
 void print_f(int key, void* value){
@@ -10,14 +11,14 @@ void print_f(int key, void* value){
 
 int main(void) {
 
-    int hash_size = 1000000;
+    int hash_size = 16000000;
 	struct Hash * hash = hash_table_create(hash_size);
     
     int r = rand();
     srand(time(NULL));
     int * pointer = &r;
 
-    int inserts = 160000002; 
+    int inserts = 16000002; 
     
     int key = -1;
     struct Entity * e = NULL;
@@ -29,7 +30,7 @@ int main(void) {
     for(int i = 0; i < inserts; i++){
         r = rand();
         
-       // key = hash_table_create_key((char*)pointer, 4);
+       // key = hash_djb2((char*)pointer, 4);
         key = i;
 
         e = hash_table_update(hash, key, NULL);
@@ -44,8 +45,10 @@ int main(void) {
         count ++;
     }
     hash_table_size_of(hash);
-    printf("\ncollisions: %d %%", (100 * hash->number_of_collisions) / inserts);
+    double v1 = hash->number_of_collisions / 1.0;
+    double v2 = inserts / 1.0;
+
+    printf("\ncollisions: %f %%",(v1*100)/v2);
  
 }
-
 */
