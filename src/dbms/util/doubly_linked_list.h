@@ -11,7 +11,7 @@
 struct List;
 
 struct Node {
-    void* content; // To store different data-types
+    void* content; /* To store different data-types */
     struct Node* next;
     struct Node* prev;
     struct List* list;
@@ -21,9 +21,9 @@ struct List{
 	 struct Node* head;
 	 struct Node* tail;
 	 int size;
-	 // The user of this list can inform the print and free functions
-	 void (* print_function)(void *); // Each type of data can have different forms of printing
-	 void (* free_function) (void *); // and different forms of deallocation (free)
+	 /* The user of this list can inform the print and free functions */
+	 void (* print_function)(void *); /* Each type of data can have different forms of printing */
+	 void (* free_function) (void *); /* and different forms of deallocation (free) */
 
 };
 

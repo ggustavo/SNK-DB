@@ -70,14 +70,14 @@ struct Bitmap * bitmap_create(size_t size){
     return bitmap;
 }
 
-int bitmap_get(struct Bitmap * bitmap, size_t index){ //AND
+int bitmap_get(struct Bitmap * bitmap, size_t index){ 
 
-    return bitmap->bits[index / 8]  >>  (7 - (index % 8) )  &  0x01;
+    return bitmap->bits[index / 8]  >>  (7 - (index % 8) )  &  0x01; /* AND */
 }
 
-void bitmap_set(struct Bitmap * bitmap, size_t index){ //OR
+void bitmap_set(struct Bitmap * bitmap, size_t index){
 
-    bitmap->bits[index / 8] = bitmap->bits[index / 8] | ( 0x01 << (7 - (index % 8) ) );
+    bitmap->bits[index / 8] = bitmap->bits[index / 8] | ( 0x01 << (7 - (index % 8) ) );  /* OR */
 }
 
 void bitmap_clear(struct Bitmap * bitmap, size_t index){
@@ -85,9 +85,9 @@ void bitmap_clear(struct Bitmap * bitmap, size_t index){
     bitmap->bits[index / 8] = bitmap->bits[index / 8] & ~( 0x01 << (7 - (index % 8) ) );
 }
 
-void bitmap_toggle(struct Bitmap * bitmap, size_t index){ //XOR
+void bitmap_toggle(struct Bitmap * bitmap, size_t index){ 
 
-    bitmap->bits[index / 8] = bitmap->bits[index / 8] ^ ( 0x01 << (7 - (index % 8) ) );
+    bitmap->bits[index / 8] = bitmap->bits[index / 8] ^ ( 0x01 << (7 - (index % 8) ) ); /* XOR */
     
 }
 
