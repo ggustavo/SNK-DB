@@ -28,11 +28,11 @@ char CATALOG_SCHEMAS_FOLDER[] = "data/schemas";
 
 // -----> Block Header Settings ---------------------------------------------------------------
 
-#define OFFSET_BLOCK_ID 0            /* Block Header Offset [00 byte to 03 byte] /* 
-#define OFFSET_USED_SIZE 4           /* Block Header Offset [04 byte to 07 byte] /* 
-#define OFFSET_LSN 8                 /* Block Header Offset [08 byte to 11 byte] /* 
-#define OFFSET_STATUS 12             /* Block Header Offset [12 byte to 15 byte] /* 
-#define OFFSET_TUPLES_INDEX_SIZE 16  /* Block Header Offset [16 byte to 19 byte] /* 
+#define OFFSET_BLOCK_ID 0            /* Block Header Offset [00 byte to 03 byte] */ 
+#define OFFSET_USED_SIZE 4           /* Block Header Offset [04 byte to 07 byte] */ 
+#define OFFSET_LSN 8                 /* Block Header Offset [08 byte to 11 byte] */ 
+#define OFFSET_STATUS 12             /* Block Header Offset [12 byte to 15 byte] */
+#define OFFSET_TUPLES_INDEX_SIZE 16  /* Block Header Offset [16 byte to 19 byte] */
 #define HEADER_SIZE 20
 #define OFFSET_FIRST_ENTITY_INDEX 20
 
