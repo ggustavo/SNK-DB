@@ -1,3 +1,7 @@
+/*
+* The data file is an abstraction of the system 
+* to access and manipulate data with physical organization in blocks
+*/
 #ifndef DATA_FILE_H_INCLUDED
 #define DATA_FILE_H_INCLUDED
 
@@ -149,7 +153,7 @@ int data_file_write_new_tuple(struct DataFile * data_file, char * tuple, int tup
 
 		if(result == ERROR_BLOCK_IS_FULL){
 			//printf("\nBLOCK FULL!");
-			data_file->number_of_blocks  = data_file->number_of_blocks + 1; //increment to create a new block
+			data_file->number_of_blocks  = data_file->number_of_blocks + 1; // increment to create a new block
 
 			header_reset(temp_header);
 			temp_header->block_id = data_file->number_of_blocks - 1;

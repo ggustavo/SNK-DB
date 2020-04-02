@@ -1,3 +1,7 @@
+/*
+* Catalog organizes and provides ways to find system files and users data
+*/
+
 #ifndef CATALOG_H_INCLUDED
 #define CATALOG_H_INCLUDED
 
@@ -51,16 +55,16 @@ char * catalog_append_path(int size, ...){
 	int i = 0;
 	char * path = NULL;
 
-	va_start(valist, size); //start va_list arguments
+	va_start(valist, size); /* start va_list arguments */
 
 	for (i = 0; i < size; i++) {
 	    path = va_arg(valist, char*);
 		path_buffer_size += strlen(path);
 	}
+ 
+	va_end(valist); /* clean valist from memory */
 
-	va_end(valist); //clean valist from memory
-
-	va_start(valist, size); //start again va_list arguments
+	va_start(valist, size); /* start again va_list arguments */
 
 	char * path_buffer = calloc(path_buffer_size, sizeof(char));
 
@@ -70,7 +74,7 @@ char * catalog_append_path(int size, ...){
 	}
 
 
-	va_end(valist); //clean valist from memory
+	va_end(valist); /* clean valist from memory */
 
 	return path_buffer;
 }

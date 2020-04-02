@@ -55,7 +55,7 @@
 #elif MQ
 	#include "buffer_manager/policies/MQ.h"
 
-#else // If no policy has been chosen. Use LRU as default
+#else /* If no policy has been chosen. Use LRU as default */
 	#include "buffer_manager/policies/LRU.h"
 #endif
 

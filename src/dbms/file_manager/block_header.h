@@ -38,10 +38,10 @@
 
 struct BlockHeader{
 	int block_id;
-	int used_size;                // Space used by tuples
-	int lsn;                      // The log sequence number (LSN) used in the recovery process
+	int used_size;                /* Space used by tuples */
+	int lsn;                      /* The log sequence number (LSN) used in the recovery process */
 	int status;
-	int tuple_index_size;         // Number of tuples in block
+	int tuple_index_size;         /* Number of tuples in block */
 };
 
 
