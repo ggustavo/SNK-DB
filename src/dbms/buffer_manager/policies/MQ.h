@@ -13,13 +13,13 @@
 #include <stdio.h>
 #include "../db_buffer.h"
 #include "../../db_config.h"
-#include <math.h> // to use LOG
+#include <math.h> // to use LOG function
 #define MIN(a,b) (((a)<(b))?(a):(b))
 
 unsigned long long int currentTime;
 unsigned long long int lifeTime;
 
-int M; // number of queue!
+int M; /*  number of queues! */
 
 struct List ** Queues;
 struct List * Qout;
@@ -58,7 +58,7 @@ void buffer_policy_start(){
     currentTime = 0;
     lifeTime = BUFFER_SIZE / 2;
     M = 8;
-    Qout_size = BUFFER_SIZE * 4; // The history buffer Qout size is set to be four time of the number of blocks in the cache
+    Qout_size = BUFFER_SIZE * 4; /*  The history buffer Qout size is set to be four time of the number of blocks in the cache */
 
     printf("\nBuffer Replacement Policy: %s with M %d queues", __FILE__, M);
     printf("\n---------------------------------------------------------------------------------------------------");
@@ -79,7 +79,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 	buffer_computes_request_statistics(page, operation);
 	//--------------------------------------------------------
 
-	if(page != NULL){ //HIT - Update reference
+	if(page != NULL){ /* HIT - Update reference */
 
 		struct MQNode * B = (struct MQNode *) page->extended_attributes;
         B->reference = B->reference + 1;
@@ -87,34 +87,34 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
         struct List * B_queue = B->node->list;
         struct List * K_queue = Queues[ QueueNum(B->reference) ];
       
-        insert_MRU(K_queue, list_remove(B_queue, B->node));  // Moves B from B_queue to K_queue
+        insert_MRU(K_queue, list_remove(B_queue, B->node));  /* Moves B from B_queue to K_queue */
 
-	} else { // MISS - page is not in Buffer (struct Page * page == NULL)
+	} else { /* MISS - page is not in Buffer (struct Page * page == NULL) */
 
 
         struct MQGhostNode * ghost = find_ghost_node(Qout, file_id, block_id);
         
-        if(ghost != NULL){ // GHOST HIT !!
+        if(ghost != NULL){ /* GHOST HIT !! */
             
             int references = ghost->reference;
             
             struct MQNode * victim = EvictBlock(); 
             
-            list_remove(Qout, ghost->node); // Removes hitted ghost
-            // We reuse the hitted ghost structure and update the victim's information on it.
-            ghost->file_id  = victim->page->file_id;  // Update file_id
-            ghost->block_id = victim->page->block_id; // Update block_id
-            ghost->reference = victim->reference;     // Udate reference
-            insert_MRU(Qout, ghost->node);  // Insert "new Ghost" 
+            list_remove(Qout, ghost->node);           /* Removes hitted ghost */
+            /* We reuse the hitted ghost structure and update the victim's information on it */
+            ghost->file_id  = victim->page->file_id;  /* Update file_id */
+            ghost->block_id = victim->page->block_id; /* Update block_id */
+            ghost->reference = victim->reference;     /* Udate reference */
+            insert_MRU(Qout, ghost->node);            /* Insert "new Ghost" */ 
            
 
-            // We reuse the victim structure
+            /* We reuse the victim structure */
             page = victim->page;
-            buffer_load_page(file_id, block_id, page);  // Read the data from storage media
-            victim->reference = references; // Don't forget the hitted ghost reference counter
+            buffer_load_page(file_id, block_id, page);   /* Read the data from storage media */
+            victim->reference = references;              /* Don't forget the hitted ghost reference counter */
             victim->expireTime = currentTime + lifeTime;
             struct List * K_queue = Queues[ QueueNum(victim->reference) ]; 
-            insert_MRU(K_queue, victim->node); // inserts into a K queue
+            insert_MRU(K_queue, victim->node); /* inserts into a K queue */
 
         }else
 
@@ -122,7 +122,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 		if (buffer_is_full() == FALSE) {
 
 			page = buffer_get_free_page();
-            buffer_load_page(file_id, block_id, page); // Read the data from storage media
+            buffer_load_page(file_id, block_id, page); /* Read the data from storage media */
 			
 			struct MQNode * B = MQ_create_node(page);  
             B->reference = B->reference + 1;
@@ -132,7 +132,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             insert_MRU(K_queue, B->node);
            
 
-		} else { // Need a replacement
+		} else { /* Need a replacement */
 
 
             struct MQNode * victim = EvictBlock(); 
@@ -143,19 +143,19 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
                 ghost = (struct MQGhostNode *) remove_LRU(Qout)->content;
             }
 
-            ghost->file_id  = victim->page->file_id;  // Update file_id
-            ghost->block_id = victim->page->block_id; // Update block_id
-            ghost->reference = victim->reference;     // Udate reference
-            insert_MRU(Qout, ghost->node);  // Insert "new Ghost" 
+            ghost->file_id  = victim->page->file_id;  /* Update file_id */
+            ghost->block_id = victim->page->block_id; /* Update block_id */
+            ghost->reference = victim->reference;     /* Udate reference */
+            insert_MRU(Qout, ghost->node);            /* Insert "new Ghost" */
 
             
             page = victim->page;
-			buffer_load_page(file_id, block_id, page); // Read new data from storage media
+			buffer_load_page(file_id, block_id, page); /* Read new data from storage media */
 
             victim->reference = 1;
             victim->expireTime = currentTime + lifeTime;
             struct List * K_queue = Queues[ QueueNum(victim->reference) ]; 
-            insert_MRU(K_queue, victim->node); // inserts into a K queue
+            insert_MRU(K_queue, victim->node); /* inserts into a K queue */
             
 		}
 
@@ -177,7 +177,7 @@ struct MQNode * EvictBlock(){
         }
     }
     printf("\n ---- REPLACEMENT victim: %c[%d-%d]", victim->page->dirty_flag, victim->page->file_id, victim->page->block_id);
-    buffer_flush_page(victim->page); // Flush the data to the secondary storage media if is dirty
+    buffer_flush_page(victim->page); /* Flush the data to the secondary storage media if is dirty */
     return victim;
 }   
 
@@ -191,7 +191,7 @@ int QueueNum(int reference){
 
 void Adjust(){
      currentTime = currentTime + 1;
-    for(int i = 1; i < M; i++){ // Start i with one
+    for(int i = 1; i < M; i++){ // Start with i = 1
         struct List * queue = Queues[i];
              if(queue->size > 0){   
                 struct MQNode * LRU = (struct MQNode *)  queue->tail->content;

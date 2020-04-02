@@ -1,6 +1,6 @@
 /*
  * Second Chance (or Clock)
- *
+ * 
  */
 #ifndef POLICY_H_INCLUDED
 #define POLICY_H_INCLUDED
@@ -58,23 +58,23 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 	buffer_computes_request_statistics(page, operation);
 	//--------------------------------------------------------
 
-	if(page != NULL){ //HIT - Update reference to 1
+	if(page != NULL){ /* HIT - Update reference to 1 */
 
 		struct ClockNode * clock_node = (struct ClockNode *) page->extended_attributes;
         clock_node->reference = 1;
 
-	} else { // MISS - page is not in Buffer (struct Page * page == NULL)
+	} else { /* MISS - page is not in Buffer (struct Page * page == NULL) */
 
 		if (buffer_is_full() == FALSE) {
 
 			page = buffer_get_free_page();
 			struct ClockNode * new_node = clock_create_node(page);
-			buffer_load_page(file_id, block_id, page); // Read the data from storage media
+			buffer_load_page(file_id, block_id, page); /* Read the data from storage media */
             clock_insert(new_node);
 
-		} else { // Need a replacement
+		} else { /* Need a replacement */
 
-            while(clock_pointer->reference == 1){ //finds an element with a reference == 0
+            while(clock_pointer->reference == 1){ /* finds an element with a reference == 0 */
                 clock_pointer->reference = 0;
                 clock_pointer = clock_next();
             }
@@ -83,9 +83,9 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 
             printf("\n ---- REPLACEMENT victim: %c[%d-%d]", victim->dirty_flag,victim->file_id,victim->block_id);
 
-			buffer_flush_page(victim); // Flush the data to the secondary storage media if is dirty
-			page = buffer_reset_page(victim); // To avoid malloc a new page we reuse the victim page
-			buffer_load_page(file_id, block_id, page); // Read new data from storage media
+			buffer_flush_page(victim); /* Flush the data to the secondary storage media if is dirty */
+			page = buffer_reset_page(victim); /* To avoid malloc a new page we reuse the victim page */
+			buffer_load_page(file_id, block_id, page); /* Read new data from storage media */
 			
             clock_pointer->reference = 1;
             clock_pointer = clock_next();

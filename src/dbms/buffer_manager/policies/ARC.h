@@ -1,6 +1,9 @@
 /*
  * Adaptive Replacement Cache (ARC) 
- * CAUTION - THIS VERSION REQUIRES MORE TESTS
+ * 
+ * Reference Papers:
+ *  - Outperforming LRU with an Adaptive Replacement Cache Algorithm (2004)
+ *  - ARC: A Self-tuning, low Overhead Replacement Cache (2003)
  */
 #ifndef POLICY_H_INCLUDED
 #define POLICY_H_INCLUDED
@@ -17,12 +20,12 @@
 struct List * T1;
 struct List * T2;
 
-struct List * G1; //Ghost List
-struct List * G2; //Ghost List
+struct List * G1; /* Ghost List G1 */
+struct List * G2; /* Ghost List G2 */
 
-int P; // Policy Advisor
+int P; /*  Policy Advisor */
                                            
-struct Ghost_Page{ // Ghost page does not store any page data only its metadata
+struct Ghost_Page{ /* Ghost page does not store any page data only its metadata */
     int file_id;
     long block_id;
 };
@@ -71,31 +74,31 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 	//--------------------------------------------------------
 
 
-	if(page != NULL){ // HIT! x ∈ T1 or T2. Move x to the top of T2.
+	if(page != NULL){ /* HIT! x ∈ T1 or T2. Move x to the top of T2. */
         
         struct Node * node = (struct Node *)page->extended_attributes;
 		
         if(node->list == T1){
-            move_to_MRU(T1, node, T2); // moves the page from T1 to T2 MRU
+            move_to_MRU(T1, node, T2); /* moves the page from T1 to T2 MRU */
         }  else  
 
         if(node->list == T2){
-            move_to_MRU(T2, node, T2); // moves the page from T2 to T2 MRU
+            move_to_MRU(T2, node, T2); /* moves the page from T2 to T2 MRU */
         }  else {
             printf("[ERR0] Why the page is not in T1 or T2 ???");
         } 
 
-	} else { // MISS - page is not in Buffer (struct Page * page == NULL)
+	} else { /* MISS - page is not in Buffer (struct Page * page == NULL) */
 
         struct Node * ghost_node = NULL;
         struct Node * victim = NULL;
-        // It is possible to have a page in G1 or G2
+        /* It is possible to have a page in G1 or G2 */
         
         ghost_node = find_ghost_page(G1, file_id, block_id);
         
-        if(ghost_node != NULL){ // Ghost HIT int G1
+        if(ghost_node != NULL){ /* Ghost HIT int G1 */
            
-            P = MIN( BUFFER_SIZE, P + MAX( SAFE_DIVISION( G2->size, G1->size), 1) ); // Adapt p = min{ buffer_size, p + max{ B2.size/B1.size, 1} }
+            P = MIN( BUFFER_SIZE, P + MAX( SAFE_DIVISION( G2->size, G1->size), 1) ); /* Adapt p = min{ buffer_size, p + max{ B2.size/B1.size, 1} } */
              
             list_remove(G1, ghost_node);
             victim = replacement(0, ghost_node); 
@@ -109,12 +112,12 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
         }
     
         ghost_node = find_ghost_page(G2, file_id, block_id);
-        if(ghost_node != NULL){ // Ghost HIT int G2
+        if(ghost_node != NULL){ /* Ghost HIT int G2 */
             
-            P = MAX( BUFFER_SIZE, P - MAX( SAFE_DIVISION( G1->size, G2->size), 1) ); // Adapt p = max{ 0, p - max{ B1.size/B2.size, 1} }
+            P = MAX( BUFFER_SIZE, P - MAX( SAFE_DIVISION( G1->size, G2->size), 1) ); /* Adapt p = max{ 0, p - max{ B1.size/B2.size, 1} } */
             
             list_remove(G2, ghost_node);
-            victim = replacement(1, ghost_node); // X E G2 == 1
+            victim = replacement(1, ghost_node); /* X E G2 == 1 */
             page = (struct Page*) victim->content;
             buffer_load_page(file_id, block_id, page);
             insert_MRU(T2, victim);
@@ -128,18 +131,18 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 
 			page = buffer_get_free_page();
             struct Node * new_node = list_create_node(page); 
-            buffer_load_page(file_id, block_id, page); // Read the data from storage media
+            buffer_load_page(file_id, block_id, page); /* Read the data from storage media */
 			insert_MRU(T1, new_node);
 
-		} else { // Need a replacement
+		} else {  /* Need a replacement */
             
             
             if( L1() == BUFFER_SIZE){
 
-                if(T1->size < BUFFER_SIZE){ //then delete the LRU page of G1 and REPLACE(p).
+                if(T1->size < BUFFER_SIZE){ /* then delete the LRU page of G1 and REPLACE(p). */
                     ghost_node = remove_LRU(G1);
                     victim = replacement(0, ghost_node); 
-                }else{ //delete LRU page of T1 and remove it from the cache.
+                }else{ /* delete LRU page of T1 and remove it from the cache. */
                     
                     victim = remove_LRU(T1);
                     page = (struct Page*) victim->content;
@@ -148,7 +151,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 
             }else 
 
-            if(L1() < BUFFER_SIZE && (L1() + L2()) >= BUFFER_SIZE){ // |L1| < c and |L1|+ |L2| ≥ c:
+            if(L1() < BUFFER_SIZE && (L1() + L2()) >= BUFFER_SIZE){ /* |L1| < c and |L1|+ |L2| ≥ c: */
                 if(L1() + L2() == BUFFER_SIZE * 2){
                     ghost_node = remove_LRU(G2);
                 }
@@ -160,7 +163,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             }
 
             page = (struct Page*) victim->content;
-            buffer_load_page(file_id, block_id, page); // Read the data from storage media
+            buffer_load_page(file_id, block_id, page); /* Read the data from storage media */
             insert_MRU(T1, victim);
 		}
 
@@ -173,7 +176,7 @@ struct Node * replacement(int x_E_G2, struct Node * ghost_node){
     struct Node * victim = NULL;
     struct Page * page = NULL;
     struct Ghost_Page * g_page = NULL;
-    if(T1->size >= 1 && ( (x_E_G2 == 1 && T1->size == P) || T1->size > P)) { //if (|T1| ≥ 1) and ((x ∈ G2 and |T1| = p) or (|T1| > p))
+    if(T1->size >= 1 && ( (x_E_G2 == 1 && T1->size == P) || T1->size > P)) { /* if (|T1| ≥ 1) and ((x ∈ G2 and |T1| = p) or (|T1| > p)) */
         victim = remove_LRU(T1);
         page = (struct Page * ) victim->content;
         g_page = (struct Ghost_Page *) ghost_node->content; 

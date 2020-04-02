@@ -18,30 +18,30 @@
 /*
  * Statistics used to evaluate the performance of the buffer manager
  */
-unsigned long long int operations = 0; //Number of requests
+unsigned long long int operations = 0; /* Number of requests */
 
-unsigned long long int miss_operations = 0;  // Number of requests when the data IS NOT in-memory
-unsigned long long int hit_operations  = 0;  // Number of requests when the data IS in-memory
+unsigned long long int miss_operations = 0;  /* Number of requests when the data IS NOT in-memory */
+unsigned long long int hit_operations  = 0;  /* Number of requests when the data IS in-memory */
 
-unsigned long long int write_operations = 0;  // Number of write requests
-unsigned long long int read_operations  = 0;  // Number of read requests
+unsigned long long int write_operations = 0;  /* Number of write requests */
+unsigned long long int read_operations  = 0;  /* Number of read requests */
 
-unsigned long long int flush_operations = 0;  // Number of pages written on the secondary storage media
-unsigned long long int load_operations  = 0;  // Number of pages loaded from secondary storage media to memory
+unsigned long long int flush_operations = 0;  /* Number of pages written on the secondary storage media */
+unsigned long long int load_operations  = 0;  /* Number of pages loaded from secondary storage media to memory */
 
 
 struct Page{
 
-	int file_id;     // Used to find the file on the secondary storage media
-	long block_id;   // Used to find the block inside the file
+	int file_id;     /* Used to find the file on the secondary storage media */
+	long block_id;   /* Used to find the block inside the file */
 
-	int frame_id;    // Frame id of page
-	char * data;     // Pointer to allocated_memory frame
+	int frame_id;    /* Frame id of page */
+	char * data;     /* Pointer to allocated_memory frame */
 
-	char status;     // Status of page (STATUS_LOCKED or STATUS_UNLOCKED)
-	char dirty_flag; // If the page is DIRTY or CLEAN
+	char status;     /* Status of page (STATUS_LOCKED or STATUS_UNLOCKED) */
+	char dirty_flag; /* If the page is DIRTY or CLEAN */
 
-	void * extended_attributes; // Used to add new attributes depending on the page replacement policy
+	void * extended_attributes; /* Used to add new attributes depending on the page replacement policy */
 };
 
 
@@ -78,19 +78,19 @@ void buffer_start() {
 	allocated_memory = (char*) malloc( BUFFER_SIZE * BLOCK_SIZE );
 	pages = (struct Page*) malloc(sizeof(struct Page) * BUFFER_SIZE);
 
-	// BUFFER_SIZE * BLOCK_SIZE determines the size of the space allocated in-memory for data
+	/* BUFFER_SIZE * BLOCK_SIZE determines the size of the space allocated in-memory for data */
 	int N = BUFFER_SIZE * BLOCK_SIZE;
 
-	for (int i = 0; i < N; i++) { // For each allocated byte
-		allocated_memory[i] = 0; // Initialize the byte with 0
+	for (int i = 0; i < N; i++) { /* For each allocated byte */
+		allocated_memory[i] = 0; /* Initialize the byte with 0 */
 
 		if (i % BLOCK_SIZE == 0) {
-			// Example: if the block_size is equal to 10, this "if" is true when i = {0, 10, 20, ...}
+			/* Example: if the block_size is equal to 10, this "if" is true when i = {0, 10, 20, ...} */
 
-			// The idea is to map each frame to be managed by a page
+			/* The idea is to map each frame to be managed by a page */
 			struct Page * page = &pages[i / BLOCK_SIZE];
 			page->frame_id = i / BLOCK_SIZE;
-			page->data = &allocated_memory[i]; //set the first pointer of this frame into the page
+			page->data = &allocated_memory[i]; /* set the first pointer of this frame into the page */
 			page->extended_attributes = NULL;
 			buffer_reset_page(page);
 			list_insert_tail(free_list,page);
@@ -247,7 +247,7 @@ void buffer_print_page_complete(void * data){
 }
 
 
-void buffer_print_statistics(){ //%llu for Linux, %I64u for Windows
+void buffer_print_statistics(){ /* %llu for Linux, %I64u for Windows ??*/
 	printf("\n-------------------Buffer Statistics---------------------------");
 	printf("\nOperations: %lld ",operations);
 	printf("(hit: %lld miss: %lld) ", hit_operations, miss_operations);

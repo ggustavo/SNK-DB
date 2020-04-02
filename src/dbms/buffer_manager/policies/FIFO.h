@@ -1,8 +1,6 @@
 /*
  * First In, First Out (FIFO)
  *
- * Use this algorithm to develop new page replacement policies.
- *
  */
 #ifndef POLICY_H_INCLUDED
 #define POLICY_H_INCLUDED
@@ -40,30 +38,30 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 	buffer_computes_request_statistics(page, operation);
 	//--------------------------------------------------------
 
-	if(page != NULL){ //HIT - DO NOTHING !!!
+	if(page != NULL){ /* HIT - DO NOTHING !!! */
 
 	
 
-	} else { // MISS - page is not in Buffer (struct Page * page == NULL)
+	} else { /* MISS - page is not in Buffer (struct Page * page == NULL) */
 
 		if (buffer_is_full() == FALSE) {
 
 			page = buffer_get_free_page();
 			struct Node * new_node = list_create_node(page);
-			buffer_load_page(file_id, block_id, page); // Read the data from storage media
+			buffer_load_page(file_id, block_id, page); /* Read the data from storage media */
 			insert_MRU(list, new_node);
 
-		} else { // Need a replacement
+		} else { /* Need a replacement */
 
 			printf("\n ---- REPLACEMENT ------ ");
 			struct Node * lru_node = remove_LRU(list);
-			struct Page * victim = (struct Page *) lru_node->content; //Get the LRU Page
+			struct Page * victim = (struct Page *) lru_node->content; /* Get the LRU Page */
 
-			buffer_flush_page(victim); // Flush the data to the secondary storage media if is dirty
+			buffer_flush_page(victim); /* Flush the data to the secondary storage media if is dirty */
 
-			page = buffer_reset_page(victim); // To avoid malloc a new page we reuse the victim page
+			page = buffer_reset_page(victim); /* To avoid malloc a new page we reuse the victim page */
 
-			buffer_load_page(file_id, block_id, page); // Read new data from storage media
+			buffer_load_page(file_id, block_id, page); /* Read new data from storage media */
 			insert_MRU(list, lru_node);
 
 		}
