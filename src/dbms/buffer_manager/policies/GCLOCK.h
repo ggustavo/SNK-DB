@@ -24,6 +24,8 @@
 
 struct List * list;
 
+int IC; // INITIAL_COUNT
+int HC; // HIT_COUNT
 
 struct ClockNode{
     struct Page * page;
@@ -48,7 +50,9 @@ struct ClockNode * clock_pointer;
 void buffer_policy_start(){
     printf("\nBuffer Replacement Policy: %s", __FILE__);
     printf("\n---------------------------------------------------------------------------------------------------");
-	
+    IC = 1;
+    HC = 1;
+
     list = list_create(buffer_print_page,NULL);
     clock_pointer = NULL;
 }
@@ -61,10 +65,10 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 	buffer_computes_request_statistics(page, operation);
 	//--------------------------------------------------------
 
-	if(page != NULL){ /* HIT - Update reference to 1 */
+	if(page != NULL){ /* HIT - Update reference */
 
 		struct ClockNode * clock_node = (struct ClockNode *) page->extended_attributes;
-        clock_node->reference =  clock_node->reference  + 1;
+        clock_node->reference =  HC;
 
 	} else { /* MISS - page is not in Buffer (struct Page * page == NULL) */
 
@@ -77,8 +81,8 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 
 		} else { /* Need a replacement */
 
-            while(clock_pointer->reference == 1){ /* finds an element with a reference == 0 */
-                clock_pointer->reference = 0;
+            while(clock_pointer->reference != 0){ /* finds an element with a reference == 0 */
+                clock_pointer->reference = clock_pointer->reference - 1;
                 clock_pointer = clock_next();
             }
 
@@ -90,7 +94,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 			page = buffer_reset_page(victim); /*  To avoid malloc a new page we reuse the victim page */
 			buffer_load_page(file_id, block_id, page); /*  Read new data from storage media */
 			
-            clock_pointer->reference = 1;
+            clock_pointer->reference = IC;
             clock_pointer = clock_next();
 
 		}
@@ -114,7 +118,7 @@ struct ClockNode * clock_create_node(struct Page * page){
     
     struct Node * new_node = list_create_node(clock_node);
     
-    clock_node->reference = 1;
+    clock_node->reference = IC;
     clock_node->node = new_node;
     clock_node->page = page;   
 

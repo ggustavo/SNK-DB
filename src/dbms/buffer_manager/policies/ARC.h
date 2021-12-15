@@ -85,7 +85,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
         if(node->list == T2){
             move_to_MRU(T2, node, T2); /* moves the page from T2 to T2 MRU */
         }  else {
-            printf("[ERR0] Why the page is not in T1 or T2 ???");
+            printf("\n[ERR0] Why the page is not in T1 or T2 ???");
         } 
 
 	} else { /* MISS - page is not in Buffer (struct Page * page == NULL) */

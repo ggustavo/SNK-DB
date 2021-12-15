@@ -54,6 +54,8 @@
 	#include "buffer_manager/policies/ARC.h"
 #elif MQ
 	#include "buffer_manager/policies/MQ.h"
+#elif FBR
+	#include "buffer_manager/policies/FBR.h"
 
 #else /* If no policy has been chosen. Use LRU as default */
 	#include "buffer_manager/policies/LRU.h"

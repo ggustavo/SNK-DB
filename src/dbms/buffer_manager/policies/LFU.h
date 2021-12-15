@@ -82,7 +82,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 			page = buffer_reset_page(victim); /* To avoid malloc a new page we reuse the victim page */
 			buffer_load_page(file_id, block_id, page); /*  Read new data from storage media */
 
-            node_victim->reference = 0;
+            node_victim->reference = 1;
 		}
 
 	}
@@ -121,7 +121,7 @@ struct LFUNode * LFU_create_node(struct Page * page){
     
     struct Node * new_node = list_create_node(lfu_node);
     
-    lfu_node->reference = 0;
+    lfu_node->reference = 1;
     lfu_node->node = new_node;
     lfu_node->page = page;   
 

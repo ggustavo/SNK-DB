@@ -47,6 +47,7 @@ gcc src/tests/test_buffer_requests.c -o database -Wall -Wextra
 |`-DGCLOCK`|Uses Generalized Clock (GCLOCK)        |`gcc (...) -DGCLOCK` |
 |`-DMQ`    |Uses Multi queue (MQ)                  |`gcc (...) -DMQ` |
 |`-DARC`   |Uses Adaptive Replacement Cache (ARC) ***(in test phase)***  |`gcc (...) -DARC` |
+|`-DFBR`   |Uses Frequency-Based Replacement (FBR) ***(in test phase)***  |`gcc (...) -DFBR` |
 
 > **Note:** Use [db_kernel.h](https://github.com/ggustavo/SNK-DB/blob/master/src/dbms/db_kernel.h). If you don't want to use these options
 
