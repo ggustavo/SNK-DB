@@ -49,6 +49,7 @@ gcc src/tests/test_buffer_requests.c -o database -Wall -Wextra
 |`-DARC`   |Uses Adaptive Replacement Cache (ARC) ***(in test phase)***  |`gcc (...) -DARC` |
 |`-DFBR`   |Uses Frequency-Based Replacement (FBR) ***(in test phase)***  |`gcc (...) -DFBR` |
 |`-DLRUMIS`   |Uses LRU with Midpoint Insertion Strategy (LRU-MIS) ***(in test phase)***  |`gcc (...) -DLRUMIS` |
+|`-DF2Q`   |Uses Full Version “Two Queue” (2Q) ***(in test phase)***  |`gcc (...) -DF2Q` |
 
 > **Note:** Use [db_kernel.h](https://github.com/ggustavo/SNK-DB/blob/master/src/dbms/db_kernel.h). If you don't want to use these options
 
