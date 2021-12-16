@@ -1,7 +1,5 @@
 /*
- * Least Recently Used (LRU)
- *
- * Use this algorithm to develop new page replacement policies.
+ * LRU with Midpoint Insertion Strategy (LRU-MIS)
  *
  */
 #ifndef POLICY_H_INCLUDED

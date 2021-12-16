@@ -1,6 +1,9 @@
 /*
  * Frequency-Based Replacement (FBR)
  * Simplified algorithm without index and the parameters Amax and Cmax 
+ * 
+ *  Reference Paper: 
+ *  - Data cache management using frequency-based replacement
  */
 #ifndef POLICY_H_INCLUDED
 #define POLICY_H_INCLUDED

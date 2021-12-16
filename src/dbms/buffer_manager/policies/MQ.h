@@ -109,7 +109,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
            
 
             /* We reuse the victim structure */
-            page = victim->page;
+            page = buffer_reset_page(victim->page);
             buffer_load_page(file_id, block_id, page);   /* Read the data from storage media */
             victim->reference = references;              /* Don't forget the hitted ghost reference counter */
             victim->expireTime = currentTime + lifeTime;
