@@ -60,6 +60,8 @@
 	#include "buffer_manager/policies/LRUMIS.h"
 #elif F2Q
 	#include "buffer_manager/policies/2Q.h"
+#elif LRUK
+	#include "buffer_manager/policies/LRUK.h"
 
 #else /* If no policy has been chosen. Use LRU as default */
 	#include "buffer_manager/policies/LRU.h"
