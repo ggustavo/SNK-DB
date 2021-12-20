@@ -48,11 +48,13 @@ gcc src/tests/test_buffer_requests.c -o database -Wall -Wextra
 |`-DMQ`    |Uses Multi queue (MQ)                  |`gcc (...) -DMQ` |
 |`-DARC`   |Uses Adaptive Replacement Cache (ARC) ***(in test phase)***  |`gcc (...) -DARC` |
 |`-DFBR`   |Uses Frequency-Based Replacement (FBR) ***(in test phase)***  |`gcc (...) -DFBR` |
-|`-DLRUMIS`   |Uses LRU with Midpoint Insertion Strategy (LRU-MIS) ***(in test phase)***  |`gcc (...) -DLRUMIS` |
+|`-DLRUMIS`   |Uses LRU with Midpoint Insertion Strategy (LRU-MIS) |`gcc (...) -DLRUMIS` |
 |`-DF2Q`   |Uses Full Version “Two Queue” (2Q) ***(in test phase)***  |`gcc (...) -DF2Q` |
 |`-DLRUK`   |Uses Least kth-to-last Reference (LRU-K) ***(in test phase)***  |`gcc (...) -DLRUK` |
 |`-DLIRS`   |Uses Low Inter-reference Recency Set (LIRS) ***(in test phase)***  |`gcc (...) -DLIRS` |
 |`-DCFLRU` |Uses Clean-First LRU (CFLRU) ***(in test phase)***  |`gcc (...) -DCFLRU` |
+|`-DLRUWSR` |Uses LRU Write Sequence Reordering (LRU-WSR) ***(in test phase)***  |`gcc (...) -DLRUWSR` |
+
 
 > **Note:** Use [db_kernel.h](https://github.com/ggustavo/SNK-DB/blob/master/src/dbms/db_kernel.h). If you don't want to use these options
 
