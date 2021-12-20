@@ -202,6 +202,7 @@ char buffer_is_full(){
 struct Page * buffer_get_free_page(){
 	if(buffer_is_full() == TRUE){
 		printf("\n[ERR0] Get Free Pages ...");
+		exit(1);
 		return NULL;
 	}
 	struct Node * node = list_remove_head(free_list);
