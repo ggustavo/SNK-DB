@@ -52,6 +52,7 @@ gcc src/tests/test_buffer_requests.c -o database -Wall -Wextra
 |`-DF2Q`   |Uses Full Version “Two Queue” (2Q) ***(in test phase)***  |`gcc (...) -DF2Q` |
 |`-DLRUK`   |Uses Least kth-to-last Reference (LRU-K) ***(in test phase)***  |`gcc (...) -DLRUK` |
 |`-DLIRS`   |Uses Low Inter-reference Recency Set (LIRS) ***(in test phase)***  |`gcc (...) -DLIRS` |
+|`-DCFLRU` |Uses Clean-First LRU (CFLRU) ***(in test phase)***  |`gcc (...) -DCFLRU` |
 
 > **Note:** Use [db_kernel.h](https://github.com/ggustavo/SNK-DB/blob/master/src/dbms/db_kernel.h). If you don't want to use these options
 

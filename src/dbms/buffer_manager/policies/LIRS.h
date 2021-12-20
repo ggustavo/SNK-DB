@@ -2,7 +2,7 @@
  * Low Inter-reference Recency Set (LIRS)
  * 
  * Reference Paper:
- * - Lirs: An efficient low inter-reference recency set replacement policy to improve buffer cache performance
+ * - LIRS: An efficient low inter-reference recency set replacement policy to improve buffer cache performance (2002)
  */
 #ifndef POLICY_H_INCLUDED
 #define POLICY_H_INCLUDED

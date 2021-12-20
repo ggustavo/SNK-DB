@@ -55,9 +55,9 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 
 		} else { /* Need a replacement */
 
-			printf("\n ---- REPLACEMENT ------ ");
 			struct Node * lru_node = remove_LRU(list);
 			struct Page * victim = (struct Page *) lru_node->content; /* Get the LRU Page */
+			printf("\n ---- REPLACEMENT victim: %c[%d-%d]", victim->dirty_flag, victim->file_id, victim->block_id);
 
 			buffer_flush_page(victim); /* Flush the data to the secondary storage media if is dirty */
 
