@@ -54,6 +54,7 @@ gcc src/tests/test_buffer_requests.c -o database -Wall -Wextra
 |`-DLIRS`   |Uses Low Inter-reference Recency Set (LIRS) ***(in test phase)***  |`gcc (...) -DLIRS` |
 |`-DCFLRU` |Uses Clean-First LRU (CFLRU) ***(in test phase)***  |`gcc (...) -DCFLRU` |
 |`-DLRUWSR` |Uses LRU Write Sequence Reordering (LRU-WSR) ***(in test phase)***  |`gcc (...) -DLRUWSR` |
+|`-DCCFLRU` |Uses CCF-LRU (Cold-Clean-First LRU) ***(in test phase)***  |`gcc (...) -DCCFLRU` |
 
 
 > **Note:** Use [db_kernel.h](https://github.com/ggustavo/SNK-DB/blob/master/src/dbms/db_kernel.h). If you don't want to use these options

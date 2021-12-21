@@ -13,7 +13,7 @@
 #include "../../db_config.h"
 
 /*
-*                                                -- LFU Structure --
+*                                                -- LRU-WSR Structure --
 * 
 *                    void *extended_attributes                           struct Node * node
 *    |-------------|-----------------------------> |------------------|-----------------------> |-------------|
@@ -32,7 +32,7 @@ struct WSRNode{
 };
 
 
-struct WSRNode * LFU_create_node(struct Page * page);
+struct WSRNode * WSR_create_node(struct Page * page);
 void WSR_insert(struct List * list, struct WSRNode * node);
 struct WSRNode * get_victim();
 void print_LRUWSR();
@@ -69,7 +69,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 		if (buffer_is_full() == FALSE) {
 
 			page = buffer_get_free_page();
-			struct WSRNode * new_node = LFU_create_node(page);
+			struct WSRNode * new_node = WSR_create_node(page);
 			buffer_load_page(file_id, block_id, page); /* Read the data from storage media */
             WSR_insert(list, new_node);
 
@@ -133,7 +133,7 @@ void WSR_insert(struct List * list, struct WSRNode * wsr_node){
 	list_insert_node_head(list,wsr_node->node);
 }
 
-struct WSRNode * LFU_create_node(struct Page * page){
+struct WSRNode * WSR_create_node(struct Page * page){
     struct WSRNode * wsr_node = (struct WSRNode *) malloc (sizeof(struct WSRNode));
     
     struct Node * new_node = list_create_node(wsr_node);
