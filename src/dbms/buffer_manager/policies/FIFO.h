@@ -86,4 +86,8 @@ void move_to_MRU(struct List * list, struct Page * page){
 	list_insert_node_head(list,node);
 }
 
+void buffer_print_policy(){
+	
+}
+
 #endif

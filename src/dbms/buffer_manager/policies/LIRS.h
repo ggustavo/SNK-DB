@@ -301,7 +301,7 @@ struct LIRSNode * LIRS_create_node(struct Page * page){
     return lirs_node;
 }
 
-void print_lirs(){
+void buffer_print_policy(){
   
     struct Node * x = stack_s->head;
     printf("\nS->");

@@ -125,5 +125,9 @@ void clock_insert(struct ClockNode * clock_node){
     clock_pointer = clock_node;
 }
 
+void buffer_print_policy(){
+    
+}
+
 
 #endif

@@ -136,5 +136,9 @@ struct LFUNode * LFU_create_node(struct Page * page){
     return lfu_node;
 }
 
+void buffer_print_policy(){
+    
+}
+
 
 #endif

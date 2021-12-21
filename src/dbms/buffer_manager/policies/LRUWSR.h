@@ -35,7 +35,7 @@ struct WSRNode{
 struct WSRNode * WSR_create_node(struct Page * page);
 void WSR_insert(struct List * list, struct WSRNode * node);
 struct WSRNode * get_victim();
-void print_LRUWSR();
+
 
 /*
  * This function is called after initializing the buffer and before page requests.
@@ -147,7 +147,7 @@ struct WSRNode * WSR_create_node(struct Page * page){
 }
 
 
-void print_LRUWSR(){
+void buffer_print_policy(){
     struct Node * x = list->head;
     printf("\n<-");
     while(x!=NULL){

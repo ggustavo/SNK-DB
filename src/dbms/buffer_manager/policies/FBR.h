@@ -192,7 +192,7 @@ struct FBRNode * FBR_create_node(struct Page * page){
 }
 
 
-void print_fbr(){
+void buffer_print_policy(){
     struct Node * x = new_section->head;
     printf("\n<-");
     while(x!=NULL){

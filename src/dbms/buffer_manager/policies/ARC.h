@@ -230,7 +230,7 @@ struct Node * find_ghost_page(struct List * list, int file_id, int block_id){
     return NULL;
 }
 
-void print_arc(){
+void buffer_print_policy(){
     struct Node * x = G1->tail;
     printf("\n<-");
     while(x!=NULL){

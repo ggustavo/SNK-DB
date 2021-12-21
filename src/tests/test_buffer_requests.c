@@ -63,7 +63,8 @@ int main(void) { //gcc src/tests/test_buffer_requests.c -o database -Wall -Wextr
         
         if(operation == 'R')buffer_request_page( map_file_id(data_file_id)->file_id, block_id, READ_REQUEST);
         if(operation == 'W')buffer_request_page( map_file_id(data_file_id)->file_id, block_id, WRITE_REQUEST);
-	}  
+        buffer_print_policy();
+    }  
 
     gettimeofday(&end_time, NULL); // End Time
 

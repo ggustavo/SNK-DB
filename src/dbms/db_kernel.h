@@ -59,7 +59,7 @@
 #elif LRUMIS
 	#include "buffer_manager/policies/LRUMIS.h"
 #elif F2Q
-	#include "buffer_manager/policies/2Q.h"
+	#include "buffer_manager/policies/F2Q.h"
 #elif LRUK
 	#include "buffer_manager/policies/LRUK.h"
 #elif LIRS

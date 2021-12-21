@@ -130,7 +130,7 @@ struct  Node * remove_LRU(struct List * list){
 	return list_remove_tail(list);
 }
 
-void print_CFLRU(){
+void buffer_print_policy(){
     struct Node * x = working->head;
     printf("\n->");
     while(x!=NULL){

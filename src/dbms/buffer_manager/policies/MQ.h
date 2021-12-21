@@ -246,7 +246,7 @@ struct MQGhostNode * find_ghost_node(struct List * list, int file_id, int block_
 
 
 
-void print_mq(){
+void buffer_print_policy(){
     
     for(int i = 0; i < M; i++){
         struct List * queue = Queues[i];

@@ -35,7 +35,6 @@ struct CCFLRUNode{
 struct CCFLRUNode * CCFLRU_create_node(struct Page * page);
 void CCFLRU_insert(struct List * list, struct CCFLRUNode * node);
 struct CCFLRUNode * get_dirty_victim();
-void print_CCFLRU();
 
 /*
  * This function is called after initializing the buffer and before page requests.
@@ -176,7 +175,7 @@ struct CCFLRUNode * CCFLRU_create_node(struct Page * page){
 }
 
 
-void print_CCFLRU(){
+void buffer_print_policy(){
     struct Node * x = mixed_list->head;
     printf("\n<-");
     while(x!=NULL){

@@ -219,7 +219,7 @@ struct A1OutGhostNode * find_ghost_node(struct List * list, int file_id, int blo
 
 
 
-void print_2Q(){
+void buffer_print_policy(){
     struct Node * x = A1in->head;
     printf("\nA1in <-");
     while(x!=NULL){

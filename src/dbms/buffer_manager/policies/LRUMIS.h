@@ -108,7 +108,7 @@ struct  Node * remove_LRU(struct List * list){
 }
 
 
-void print_lrumis(){
+void buffer_print_policy(){
     struct Node * x = hot->head;
     printf("\n<-");
     while(x!=NULL){

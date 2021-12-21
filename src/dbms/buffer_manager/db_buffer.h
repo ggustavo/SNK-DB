@@ -13,7 +13,7 @@
 #include "../file_manager/db_access_file.h"
 #include "../util/doubly_linked_list.h"
 
-
+void buffer_print_policy();
 
 /*
  * Statistics used to evaluate the performance of the buffer manager

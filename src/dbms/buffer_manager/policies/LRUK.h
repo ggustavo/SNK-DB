@@ -207,7 +207,7 @@ struct LRUKNode * create_lruk_node(struct Page * page){
 
 }
 
-void print_lruk(){
+void buffer_print_policy(){
     struct Node * x = list->head;
     printf("\n<-");
     while(x!=NULL){
