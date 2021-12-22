@@ -38,26 +38,27 @@ gcc src/tests/test_buffer_requests.c -o database -Wall -Wextra
 
 |Name          |Action                           |Example		   |
 |----------------|-------------------------------|------------     |
-|`-DLRU`   |Uses Least Recently Used (LRU)         |`gcc (...) -DLRU` |
-|`-DMRU`   |Uses Most Recently Used (MRU)          |`gcc (...) -DMRU` |
-|`-DFIFO`  |Uses First In, First Out (FIFO)        |`gcc (...) -DFIFO` |
-|`-DLFU`   |Uses Least Frequently Used (LFU)       |`gcc (...) -DLFU` |
-|`-DLFUDA` |Uses Least Frequently Used with Dynamic Aging (LFU-DA)       |`gcc (...) -DLFUDA` |
-|`-DCLOCK` |Uses Second Chance (or Clock)          |`gcc (...) -DCLOCK` |
-|`-DGCLOCK`|Uses Generalized Clock (GCLOCK)        |`gcc (...) -DGCLOCK` |
-|`-DMQ`    |Uses Multi queue (MQ)                  |`gcc (...) -DMQ` |
-|`-DARC`   |Uses Adaptive Replacement Cache (ARC) ***(in test phase)***  |`gcc (...) -DARC` |
-|`-DFBR`   |Uses Frequency-Based Replacement (FBR) ***(in test phase)***  |`gcc (...) -DFBR` |
-|`-DLRUMIS`   |Uses LRU with Midpoint Insertion Strategy (LRU-MIS) |`gcc (...) -DLRUMIS` |
-|`-DF2Q`   |Uses Full Version “Two Queue” (2Q) ***(in test phase)***  |`gcc (...) -DF2Q` |
-|`-DLRUK`   |Uses Least kth-to-last Reference (LRU-K) ***(in test phase)***  |`gcc (...) -DLRUK` |
-|`-DLIRS`   |Uses Low Inter-reference Recency Set (LIRS) ***(in test phase)***  |`gcc (...) -DLIRS` |
-|`-DCFLRU` |Uses Clean-First LRU (CFLRU) ***(in test phase)***  |`gcc (...) -DCFLRU` |
-|`-DLRUWSR` |Uses LRU Write Sequence Reordering (LRU-WSR) ***(in test phase)***  |`gcc (...) -DLRUWSR` |
-|`-DCCFLRU` |Uses Cold-Clean-First LRU (CCF-LRU) ***(in test phase)***  |`gcc (...) -DCCFLRU` |
-|`-DCCCFLRU` |Uses Controllable Cold Clean First Least Recently Used (CCCF-LRU) ***(in test phase)***  |`gcc (...) -DCCCFLRU` |
-|`-DCFDC` |Uses Clean-First Dirty-Clustered (CFDC) ***(in test phase)***  |`gcc (...) -DCFDC` |
-|`-DCASA` |Uses Cost-Aware Self-Adaptive (CASA) ***(in test phase)***  |`gcc (...) -DCASA` |
+|`-DLRU`   |Least Recently Used (LRU)         |`gcc (...) -DLRU` |
+|`-DMRU`   |Most Recently Used (MRU)          |`gcc (...) -DMRU` |
+|`-DFIFO`  |First In, First Out (FIFO)        |`gcc (...) -DFIFO` |
+|`-DLFU`   |Least Frequently Used (LFU)       |`gcc (...) -DLFU` |
+|`-DLFUDA` |Least Frequently Used with Dynamic Aging (LFU-DA)       |`gcc (...) -DLFUDA` |
+|`-DCLOCK` |Second Chance (or Clock)          |`gcc (...) -DCLOCK` |
+|`-DGCLOCK`|Generalized Clock (GCLOCK)        |`gcc (...) -DGCLOCK` |
+|`-DMQ`    |Multi queue (MQ)                  |`gcc (...) -DMQ` |
+|`-DARC`   |Adaptive Replacement Cache (ARC) ***(in test phase)***  |`gcc (...) -DARC` |
+|`-DFBR`   |Frequency-Based Replacement (FBR) ***(in test phase)***  |`gcc (...) -DFBR` |
+|`-DLRUMIS`   |LRU with Midpoint Insertion Strategy (LRU-MIS) |`gcc (...) -DLRUMIS` |
+|`-DF2Q`   |Full Version “Two Queue” (2Q) ***(in test phase)***  |`gcc (...) -DF2Q` |
+|`-DLRUK`   |Least kth-to-last Reference (LRU-K) ***(in test phase)***  |`gcc (...) -DLRUK` |
+|`-DLIRS`   |Low Inter-reference Recency Set (LIRS) ***(in test phase)***  |`gcc (...) -DLIRS` |
+|`-DCFLRU` |Clean-First LRU (CFLRU) ***(in test phase)***  |`gcc (...) -DCFLRU` |
+|`-DLRUWSR` |LRU Write Sequence Reordering (LRU-WSR) ***(in test phase)***  |`gcc (...) -DLRUWSR` |
+|`-DCCFLRU` |Cold-Clean-First LRU (CCF-LRU) ***(in test phase)***  |`gcc (...) -DCCFLRU` |
+|`-DCCCFLRU` |Controllable Cold Clean First Least Recently Used (CCCF-LRU) ***(in test phase)***  |`gcc (...) -DCCCFLRU` |
+|`-DCFDC` |Clean-First Dirty-Clustered (CFDC) ***(in test phase)***  |`gcc (...) -DCFDC` |
+|`-DCASA` |Cost-Aware Self-Adaptive (CASA) ***(in test phase)***  |`gcc (...) -DCASA` |
+|`-ADLRU` |Adaptive Double LRU (AD-LRU) ***(in test phase)*** |`gcc (...) -ADLRU` |
 
 
 

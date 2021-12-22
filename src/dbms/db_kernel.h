@@ -76,6 +76,8 @@
 	#include "buffer_manager/policies/CFDC.h"
 #elif CASA
 	#include "buffer_manager/policies/CASA.h"
+#elif ADLRU
+	#include "buffer_manager/policies/ADLRU.h"
 
 #else /* If no policy has been chosen. Use LRU as default */
 	#include "buffer_manager/policies/LRU.h"
