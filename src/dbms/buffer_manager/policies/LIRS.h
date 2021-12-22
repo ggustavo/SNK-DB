@@ -69,6 +69,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 		struct LIRSNode * lirs_node = (struct LIRSNode *) page->extended_attributes;
         
         if(lirs_node->is_ghost == TRUE){
+            
             printf("\n[ERR0R] Ghost page found in Real Buffer");
             exit(1);
         }
@@ -188,6 +189,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             struct LIRSNode * new_node = NULL;
             
             if(ghost != NULL){
+                printf("\n Hit Ghost: %d", ghost->g_block_id);
                 new_node = ghost;
                 new_node->status = LIR;   
                 new_node->is_ghost = FALSE;
@@ -195,6 +197,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
                 new_node->node_list_q  = NULL;
                 list_insert_node_head(stack_s, new_node->node_stack_s);
                 new_node->page = page;
+                page->extended_attributes = new_node;
 
                 //demote the LIR page at the bottom of the stack S to HIR status
                 struct LIRSNode * demoted = (struct LIRSNode *) stack_s->tail->content; 
@@ -328,7 +331,11 @@ void print_LIRS_page(struct LIRSNode * node){
         return;
     }
     if(node->status == LIR){
-        printf(" [%d-%ld]L", node->page->file_id, node->page->block_id);
+        if(node->is_ghost == TRUE){
+            printf(" [%d-%ld]L*(ERR0)", node->page->file_id, node->page->block_id); 
+        }else{
+            printf(" [%d-%ld]L", node->page->file_id, node->page->block_id);
+        }
     }else
     if(node->status == HIR){
         if(node->is_ghost == TRUE){

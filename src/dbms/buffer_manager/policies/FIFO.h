@@ -10,10 +10,8 @@
 #include "../db_buffer.h"
 #include "../../db_config.h"
 
-void insert_MRU(struct List * list, struct Node * node);
-struct Node * remove_LRU(struct List * list);
-void move_to_MRU(struct List * list, struct Page * page);
-
+void FIFO_insert(struct List * list, struct Node * node);
+struct Node * FIFO_remove(struct List * list);
 
 struct List * list;
 
@@ -49,12 +47,12 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 			page = buffer_get_free_page();
 			struct Node * new_node = list_create_node(page);
 			buffer_load_page(file_id, block_id, page); /* Read the data from storage media */
-			insert_MRU(list, new_node);
+			FIFO_insert(list, new_node);
 
 		} else { /* Need a replacement */
 
 			printf("\n ---- REPLACEMENT ------ ");
-			struct Node * lru_node = remove_LRU(list);
+			struct Node * lru_node = FIFO_remove(list);
 			struct Page * victim = (struct Page *) lru_node->content; /* Get the LRU Page */
 
 			buffer_flush_page(victim); /* Flush the data to the secondary storage media if is dirty */
@@ -62,7 +60,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 			page = buffer_reset_page(victim); /* To avoid malloc a new page we reuse the victim page */
 
 			buffer_load_page(file_id, block_id, page); /* Read new data from storage media */
-			insert_MRU(list, lru_node);
+			FIFO_insert(list, lru_node);
 
 		}
 
@@ -71,19 +69,13 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 	return page;
 }
 
-void insert_MRU(struct List * list, struct Node * node){
+void FIFO_insert(struct List * list, struct Node * node){
 	list_insert_node_head(list,node);
 	((struct Page*)node->content)->extended_attributes = node;
 }
 
-struct  Node * remove_LRU(struct List * list){
+struct  Node * FIFO_remove(struct List * list){
 	return list_remove_tail(list);
-}
-
-void move_to_MRU(struct List * list, struct Page * page){
-	struct Node * node = (struct Node *) page->extended_attributes;
-	list_remove(list,node);
-	list_insert_node_head(list,node);
 }
 
 void buffer_print_policy(){

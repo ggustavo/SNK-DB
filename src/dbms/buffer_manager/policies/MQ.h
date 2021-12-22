@@ -14,7 +14,6 @@
 #include "../db_buffer.h"
 #include "../../db_config.h"
 #include <math.h> // to use LOG function
-#define MIN(a,b) (((a)<(b))?(a):(b))
 
 unsigned long long int currentTime;
 unsigned long long int lifeTime;

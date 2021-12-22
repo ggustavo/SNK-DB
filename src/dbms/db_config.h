@@ -6,7 +6,7 @@
 // --------------------------------------------------------------------------------------------
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
-#define SAFE_DIVISION(a,b) ( ((b)==(0))?(0):((a)/(b)) ) 
+#define SAFE_DIVISION(a,b) ( ((b)==(0))?(0):(((double)a)/((double)b)) ) 
 #define ABS(N) ((N<0)?(-N):(N))
 
 #include <stdio.h>

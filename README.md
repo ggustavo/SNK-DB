@@ -57,6 +57,7 @@ gcc src/tests/test_buffer_requests.c -o database -Wall -Wextra
 |`-DCCFLRU` |Uses Cold-Clean-First LRU (CCF-LRU) ***(in test phase)***  |`gcc (...) -DCCFLRU` |
 |`-DCCCFLRU` |Uses Controllable Cold Clean First Least Recently Used (CCCF-LRU) ***(in test phase)***  |`gcc (...) -DCCCFLRU` |
 |`-DCFDC` |Uses Clean-First Dirty-Clustered (CFDC) ***(in test phase)***  |`gcc (...) -DCFDC` |
+|`-DCASA` |Uses Cost-Aware Self-Adaptive (CASA) ***(in test phase)***  |`gcc (...) -DCASA` |
 
 
 
