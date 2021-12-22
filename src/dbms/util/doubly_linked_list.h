@@ -148,7 +148,7 @@ void list_print_inverse(struct List* list){
 	}
 }
 
-static void list_free_node(struct List* list, struct Node * x){
+void list_free_node(struct List* list, struct Node * x){
 	x->next = NULL;
 	x->prev = NULL;
 	if(list->free_function != NULL){
@@ -157,6 +157,14 @@ static void list_free_node(struct List* list, struct Node * x){
 	x->content = NULL;
     x->list = NULL;
 	free(x);
+}
+
+void list_free(struct List* list){
+	 list->head = NULL;
+	 list->tail = NULL;
+	 list->print_function = NULL;
+	 list->free_function = NULL;
+	 free(list);
 }
 
 #endif

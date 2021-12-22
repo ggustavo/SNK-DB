@@ -1,5 +1,5 @@
 /*
- * CCF-LRU (Cold-Clean-First LRU)
+ * Cold-Clean-First LRU (CCF-LRU)
  * Reference Paper:
  * - CCF-LRU: a new buffer replacement algorithm for flash memory (2009)
  * 

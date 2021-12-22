@@ -8,10 +8,6 @@
 #ifndef POLICY_H_INCLUDED
 #define POLICY_H_INCLUDED
 
-#define MIN(a,b) (((a)<(b))?(a):(b))
-#define MAX(a,b) (((a)>(b))?(a):(b))
-#define SAFE_DIVISION(a,b) ( ((b)==(0))?(0):((a)/(b)) ) 
-
 #include <stdlib.h>
 #include <stdio.h>
 #include "../db_buffer.h"

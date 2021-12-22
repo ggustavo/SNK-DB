@@ -1,6 +1,14 @@
 #ifndef CONFIG_H_INCLUDED
 #define CONFIG_H_INCLUDED
 
+
+// -----> Simple Macros --------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
+#define SAFE_DIVISION(a,b) ( ((b)==(0))?(0):((a)/(b)) ) 
+#define ABS(N) ((N<0)?(-N):(N))
+
 #include <stdio.h>
 #include <stdlib.h>
 

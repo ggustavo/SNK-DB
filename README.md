@@ -54,8 +54,9 @@ gcc src/tests/test_buffer_requests.c -o database -Wall -Wextra
 |`-DLIRS`   |Uses Low Inter-reference Recency Set (LIRS) ***(in test phase)***  |`gcc (...) -DLIRS` |
 |`-DCFLRU` |Uses Clean-First LRU (CFLRU) ***(in test phase)***  |`gcc (...) -DCFLRU` |
 |`-DLRUWSR` |Uses LRU Write Sequence Reordering (LRU-WSR) ***(in test phase)***  |`gcc (...) -DLRUWSR` |
-|`-DCCFLRU` |Uses CCF-LRU (Cold-Clean-First LRU) ***(in test phase)***  |`gcc (...) -DCCFLRU` |
-|`-DCCCFLRU` |Controllable Cold Clean First Least Recently Used (CCCF-LRU) ***(in test phase)***  |`gcc (...) -DCCCFLRU` |
+|`-DCCFLRU` |Uses Cold-Clean-First LRU (CCF-LRU) ***(in test phase)***  |`gcc (...) -DCCFLRU` |
+|`-DCCCFLRU` |Uses Controllable Cold Clean First Least Recently Used (CCCF-LRU) ***(in test phase)***  |`gcc (...) -DCCCFLRU` |
+|`-DCFDC` |Uses Clean-First Dirty-Clustered (CFDC) ***(in test phase)***  |`gcc (...) -DCFDC` |
 
 
 
