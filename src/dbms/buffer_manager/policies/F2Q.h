@@ -81,7 +81,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
         if (node->list == Am){ // move to Am MRU
            list_remove(node->list, node);
            insert_MRU(Am, node);
-        } //else do nothing
+        } //else { do nothing }
 
 	} else { /* MISS - page is not in Buffer (struct Page * page == NULL) */
 
@@ -104,7 +104,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
                 victim = (struct Page*) node_victim->content;
             }
 
-            printf("\n ---- REPLACEMENT victim: %c[%d-%d]", victim->dirty_flag, victim->file_id, victim->block_id);
+            debug("\n ---- REPLACEMENT victim: %c[%d-%d]", victim->dirty_flag, victim->file_id, victim->block_id);
 
             if (victim_list == A1in){
                 list_remove(A1out, ghost->node);    /* Removes hitted ghost */
@@ -156,7 +156,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             }
             
             
-            printf("\n ---- REPLACEMENT victim: %c[%d-%d]", victim->dirty_flag, victim->file_id, victim->block_id);
+            debug("\n ---- REPLACEMENT victim: %c[%d-%d]", victim->dirty_flag, victim->file_id, victim->block_id);
             
             buffer_flush_page(victim);
             page = buffer_reset_page(victim);
@@ -177,12 +177,14 @@ struct A1OutGhostNode * get_ghost_page(){
         ghost = (struct A1OutGhostNode *) list_remove_tail(free_ghost_nodes)->content;
     }else{
         if (A1out->size != Kout){
-             printf("\n[ERROR] 2Q A1out is not full but free_ghost_nodes is empty");
+            printf("\n[ERROR] 2Q A1out is not full but free_ghost_nodes is empty");
+            exit(1);
         }
         ghost = (struct A1OutGhostNode *) list_remove_tail(A1out)->content;
     }
     if(ghost == NULL){
         printf("\n[ERROR] 2Q ghost is NULL?");
+        exit(1);
     }
     return ghost;
 }
@@ -191,6 +193,7 @@ void insert_ghost_page(struct A1OutGhostNode * ghost ){
     
     if (A1out->size >= Kout){
         printf("\n[ERROR] 2Q A1out is full and there is an extra ghost");
+        exit(1);
     }
     list_insert_node_head(A1out, ghost->node);
 }

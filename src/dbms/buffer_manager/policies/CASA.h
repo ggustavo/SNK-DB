@@ -51,7 +51,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
     
 
 	if(page != NULL){ /* HIT - Update MRU */
-        printf("   ADVISOR BEFORE: %f", advisor);
+        debug("   ADVISOR BEFORE: %f", advisor);
         
         struct Node * node = (struct Node *) page->extended_attributes;
         
@@ -82,7 +82,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             exit(1);
         }
         
-        printf(" AFTER: %f", advisor);
+        debug(" AFTER: %f", advisor);
 
 	} else { /* MISS - page is not in Buffer (struct Page * page == NULL) */
 
@@ -97,20 +97,32 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             }else{
                 insert_MRU(D, new_node);
             }
-            
+            page->extended_attributes = new_node;
 
 		} else { /* Need a replacement */
 
 			struct Node * lru_node = NULL;
 
-            if( (double) C->size > advisor){
+            if( (double) C->size >= advisor){ // Using >= if the adivsor is equals the BUFFER_SIZE and D is empty
                 lru_node = remove_LRU(C);
             }else{
                 lru_node = remove_LRU(D);
             }
 
+            if(lru_node == NULL){
+                printf("\n[ERR0] CASA: lru_node is NULL C:%d D:%d A:%f", C->size, D->size,advisor);
+                //buffer_print_policy();
+                exit(1);
+            }
+
 			struct Page * victim = (struct Page *) lru_node->content; /* Get the LRU Page */
-			printf("\n ---- REPLACEMENT victim: %c[%d-%d]", victim->dirty_flag, victim->file_id, victim->block_id);
+            
+            if (victim == NULL){
+                printf("\n[ERR0] CASA: victim is NULL");
+                exit(1);
+            }
+            
+            debug("\n ---- REPLACEMENT victim: %c[%d-%d]", victim->dirty_flag, victim->file_id, victim->block_id);
 
 			buffer_flush_page(victim); /* Flush the data to the secondary storage media if is dirty */
 
@@ -124,6 +136,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             }else{
                 insert_MRU(D, lru_node);
             }
+            page->extended_attributes = lru_node;
 
 		}
 
@@ -134,7 +147,6 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 
 void insert_MRU(struct List * list, struct Node * node){
 	list_insert_node_head(list,node);
-	((struct Page*)node->content)->extended_attributes = node;
 }
 
 struct  Node * remove_LRU(struct List * list){
@@ -161,7 +173,7 @@ void buffer_print_policy(){
         printf(" %c[%d-%d]", page->dirty_flag, page->file_id, page->block_id);
         x = x->next;
     }
-    //printf(" advisor: %f", advisor);
+    //debug(" advisor: %f", advisor);
 }
 
 #endif

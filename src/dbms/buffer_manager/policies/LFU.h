@@ -76,7 +76,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             
             struct Page * victim = node_victim->page;
 
-            printf("\n ---- REPLACEMENT victim: %c[%d-%d]-%d", victim->dirty_flag, victim->file_id, victim->block_id,node_victim->reference);
+            debug("\n ---- REPLACEMENT victim: %c[%d-%d]-%d", victim->dirty_flag, victim->file_id, victim->block_id,node_victim->reference);
 
 			buffer_flush_page(victim); /* Flush the data to the secondary storage media if is dirty */
 			page = buffer_reset_page(victim); /* To avoid malloc a new page we reuse the victim page */

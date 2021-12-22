@@ -175,7 +175,7 @@ struct MQNode * EvictBlock(){
             break;
         }
     }
-    printf("\n ---- REPLACEMENT victim: %c[%d-%d]", victim->page->dirty_flag, victim->page->file_id, victim->page->block_id);
+    debug("\n ---- REPLACEMENT victim: %c[%d-%d]", victim->page->dirty_flag, victim->page->file_id, victim->page->block_id);
     buffer_flush_page(victim->page); /* Flush the data to the secondary storage media if is dirty */
     return victim;
 }   
@@ -184,7 +184,7 @@ int QueueNum(int reference){
     
     int queue = MIN( log2(reference), M - 1 );
 
-    printf("\n --> Sent to List: %d", queue);
+    debug("\n --> Sent to List: %d", queue);
     return queue;
 }
 
@@ -195,7 +195,7 @@ void Adjust(){
              if(queue->size > 0){   
                 struct MQNode * LRU = (struct MQNode *)  queue->tail->content;
                 if(LRU->expireTime < currentTime){
-                    printf("\nAjust %c[%d-%d]", LRU->page->dirty_flag, LRU->page->file_id, LRU->page->block_id );
+                    debug("\nAjust %c[%d-%d]", LRU->page->dirty_flag, LRU->page->file_id, LRU->page->block_id );
                     list_remove(queue, LRU->node);
                     insert_MRU(Queues[i - 1], LRU->node);
                     LRU->expireTime = currentTime + lifeTime;

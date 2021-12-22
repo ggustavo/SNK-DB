@@ -102,7 +102,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             list_remove(list, lruk_node->node);
 
 			struct Page * victim = lruk_node->page; /* Get the LRU Page */
-            printf("\n ---- REPLACEMENT victim: %c[%d-%d]", victim->dirty_flag, victim->file_id, victim->block_id);
+            debug("\n ---- REPLACEMENT victim: %c[%d-%d]", victim->dirty_flag, victim->file_id, victim->block_id);
 			
             buffer_flush_page(victim); /* Flush the data to the secondary storage media if is dirty */
 			page = buffer_reset_page(victim); /* To avoid malloc a new page we reuse the victim page */

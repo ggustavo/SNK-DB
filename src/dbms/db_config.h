@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 // -----> Buffer Manager Setting --------------------------------------------------------------
 // --------------------------------------------------------------------------------------------
@@ -98,5 +99,14 @@ char CATALOG_SCHEMAS_FOLDER[] = "data/schemas";
 #else
 	#define xmkdir(path) mkdir(path, 0777); /* -DWIN to compile on Windows (warning: is not stable) */
 #endif
+
+void debug(const char *format, ...) {
+    va_list vl;
+    va_start(vl, format);
+    //vprintf(format, vl);
+    //printf(format, vl);
+    va_end(vl);
+}
+
 
 #endif

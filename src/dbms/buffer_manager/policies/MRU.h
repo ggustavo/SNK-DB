@@ -53,7 +53,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 
 		} else { /* Need a replacement */
 
-			printf("\n ---- REPLACEMENT ------ ");
+			debug("\n ---- REPLACEMENT ------ ");
 			struct Node * mru_node = remove_MRU(list);
 			struct Page * victim = (struct Page *) mru_node->content; /* Get the MRU Page */
 

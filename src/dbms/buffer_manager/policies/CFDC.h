@@ -146,7 +146,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             }
             struct Page * victim = node_victim->page;
 
-            printf("\n ---- REPLACEMENT victim: %c[%d-%d]", victim->dirty_flag, victim->file_id, victim->block_id);
+            debug("\n ---- REPLACEMENT victim: %c[%d-%d]", victim->dirty_flag, victim->file_id, victim->block_id);
 
 			buffer_flush_page(victim); /* Flush the data to the secondary storage media if is dirty */
 			page = buffer_reset_page(victim); /* To avoid malloc a new page we reuse the victim page */
@@ -169,7 +169,7 @@ void CFDC_insert_working(struct CFDCNode * cfdc_node){
 	if(working_queue->size >= working_region_size){
         // LRU page is removed from the working queue
         struct Node * lru = list_remove_tail(working_queue); 
-        //printf("\n ---- LRU: %c[%d-%d]", ((struct CFDCNode *) lru->content)->page->dirty_flag, ((struct CFDCNode *) lru->content)->page->file_id, ((struct CFDCNode *) lru->content)->page->block_id);
+        //debug("\n ---- LRU: %c[%d-%d]", ((struct CFDCNode *) lru->content)->page->dirty_flag, ((struct CFDCNode *) lru->content)->page->file_id, ((struct CFDCNode *) lru->content)->page->block_id);
         CFDC_insert_priority((struct CFDCNode *) lru->content);
     }
     CFDC_insert(working_queue, cfdc_node);
@@ -246,7 +246,7 @@ double CFDC_priority_function(struct Cluster * cluster){
     int n_2 = cluster->list->size * cluster->list->size; 
     double value = SAFE_DIVISION( (double) IPD,  n_2 * (GC - cluster->timestamp) );
 
-    printf("---- %d / %d * (%d - %d) = %f", IPD, n_2, GC, cluster->timestamp,value);
+    debug("---- %d / %d * (%d - %d) = %f", IPD, n_2, GC, cluster->timestamp,value);
     return value;
 
 }
@@ -380,6 +380,7 @@ void CFDC_destroy_cluster(struct Cluster * cluster){
     
     if (cluster->list != NULL && cluster->list->size > 0){
         printf("\n[ERR0] CFDC: cluster list is not empty");
+        exit(1);
     }
 
     list_free(cluster->list);    

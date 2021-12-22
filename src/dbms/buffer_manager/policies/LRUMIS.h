@@ -64,9 +64,16 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 
 		} else { /* Need a replacement */
 
-			printf("\n ---- REPLACEMENT ------ ");
 			struct Node * lru_node = remove_LRU(cold);
 			struct Page * victim = (struct Page *) lru_node->content; /* Get the LRU Page */
+			
+            if(lru_node == NULL){
+                printf("\n[ERR0] LRU_MIS: lru_node == NULL");
+                exit(1);
+            }
+            
+            debug("\n ---- REPLACEMENT victim: %c[%d-%d]", victim->dirty_flag, victim->file_id, victim->block_id);
+
 
 			buffer_flush_page(victim); /* Flush the data to the secondary storage media if is dirty */
 
@@ -84,10 +91,10 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 }
 
 void insert_Hot(struct Node * node){
-	
+
     if(hot->size >= hot_size){
-        struct Node * node = list_remove_tail(hot);
-        insert_Cold(node);
+        struct Node * victim = list_remove_tail(hot);
+        insert_Cold(victim);
     }
     
     list_insert_node_head(hot,node);
@@ -95,8 +102,9 @@ void insert_Hot(struct Node * node){
 
 void insert_Cold(struct Node * node){
 	
-    if(hot->size >= hot_size){
-        printf("\n[ERR0] Inserting in the hot list with maximum size already reached");
+    if(hot->size > hot_size){
+       printf("\n[ERR0] Inserting in the hot list with maximum size already reached");
+       exit(1);
     }
     
     list_insert_node_head(cold,node);

@@ -179,7 +179,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 
     
 
-            printf("\n ---- REPLACEMENT victim: %c[%d-%d]", victim->dirty_flag, victim->file_id, victim->block_id);
+            debug("\n ---- REPLACEMENT victim: %c[%d-%d]", victim->dirty_flag, victim->file_id, victim->block_id);
 
 			buffer_flush_page(victim); /* Flush the data to the secondary storage media if is dirty */
 			page = buffer_reset_page(victim); /* To avoid malloc a new page we reuse the victim page */
@@ -189,7 +189,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             struct LIRSNode * new_node = NULL;
             
             if(ghost != NULL){
-                printf("\n Hit Ghost: %d", ghost->g_block_id);
+               
                 new_node = ghost;
                 new_node->status = LIR;   
                 new_node->is_ghost = FALSE;
@@ -272,8 +272,8 @@ void stack_pruning(){
         list_free_node(stack_s, x);
         lirs_node->node_stack_s = NULL;
 
-        printf("\nstack_pruning ");
-        print_LIRS_page(lirs_node);
+        debug("\nstack_pruning ");
+        //print_LIRS_page(lirs_node);
         
         if(lirs_node->is_ghost == TRUE){
             if(lirs_node->page != NULL){
