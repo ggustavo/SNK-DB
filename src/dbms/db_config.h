@@ -104,7 +104,7 @@ void debug(const char *format, ...) {
     va_list vl;
     va_start(vl, format);
     vprintf(format, vl);
-    //printf(format, vl);
+    //-------------> printf(format, vl); 
     va_end(vl);
 }
 

@@ -48,7 +48,7 @@ struct WSRNode * ajust_FC(struct List* list);
  * Initialize the structures used in the page replacement policy here.
  */
 void buffer_policy_start(){
-    min_lc = BUFFER_SIZE / 2;
+    min_lc = BUFFER_SIZE / 2; // TODO: 0.1 of BUFFER_SIZE 
     printf("\nBuffer Replacement Policy: %s\nmin_lc:%d", __FILE__, min_lc);
     printf("\n---------------------------------------------------------------------------------------------------");
 	

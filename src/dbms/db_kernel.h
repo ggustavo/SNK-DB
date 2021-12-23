@@ -78,6 +78,8 @@
 	#include "buffer_manager/policies/CASA.h"
 #elif ADLRU
 	#include "buffer_manager/policies/ADLRU.h"
+#elif LLRU
+	#include "buffer_manager/policies/LLRU.h"
 
 #else /* If no policy has been chosen. Use LRU as default */
 	#include "buffer_manager/policies/LRU.h"

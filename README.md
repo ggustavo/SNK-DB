@@ -59,6 +59,7 @@ gcc src/tests/test_buffer_requests.c -o database -Wall -Wextra
 |`-DCFDC` |Clean-First Dirty-Clustered (CFDC) ***(in test phase)***  |`gcc (...) -DCFDC` |
 |`-DCASA` |Cost-Aware Self-Adaptive (CASA) ***(in test phase)***  |`gcc (...) -DCASA` |
 |`-ADLRU` |Adaptive Double LRU (AD-LRU) ***(in test phase)*** |`gcc (...) -ADLRU` |
+|`-LLRU` |Locality-aware Least Recently Used (LLRU) ***(in test phase)*** |`gcc (...) -LLRU` |
 
 
 
