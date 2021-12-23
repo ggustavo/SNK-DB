@@ -1,7 +1,7 @@
 /*
- * Locality-aware Least Recently Used (LLRU)
+ * (AM-LRU)
  * Reference Paper:
- * - Locality-Aware Replacement Algorithm in Flash Memory to Optimize Cloud Computing for Smart Factory of Industry 4.0 (2017)
+ * - A Multiple LRU List Buffer Management Algorithm (2019)
  */
 #ifndef POLICY_H_INCLUDED
 #define POLICY_H_INCLUDED
@@ -29,6 +29,7 @@ struct List * cold_dirty;
 double ECC; // evict cost for clean page
 double ECD; // evict cost for dirty page
 
+int min_len;
 
 struct LLRUNode{
     struct Page * page;
@@ -50,9 +51,10 @@ void LLRU_print_PC(struct Node * x);
  * Initialize the structures used in the page replacement policy here.
  */
 void buffer_policy_start(){
+    min_len = MAX(1, (int) (BUFFER_SIZE * 0.10) ); // ? the min_len is 10 times of the buffer size ?
 	ECC = 1.0; 
-    ECD = 18.0;
-    printf("\nBuffer Replacement Policy: %s\nECC:%f ECD:%f", __FILE__, ECC, ECD);
+    ECD = 18.0; 
+    printf("\nBuffer Replacement Policy: %s\nECC:%f ECD:%f min_len:%d", __FILE__, ECC, ECD, min_len);
     printf("\n---------------------------------------------------------------------------------------------------");
     hot_clean  = list_create(NULL,NULL);
     hot_dirty  = list_create(NULL,NULL);
@@ -136,7 +138,17 @@ struct LLRUNode * get_victim(){
     struct LLRUNode * P_HD = get_LLRUNode(hot_dirty->tail);
 
     struct LLRUNode * nodes[4] = {P_CC, P_CD, P_HC, P_HD};
-   
+    
+
+    if (cold_clean->size < min_len){ //hen the length of the cold clean LRU list is less than min_len
+       nodes[0] = NULL; //the cold clean LRU list does not participate in the selection process of the pending evicting page.
+        //compares the page cost of the other three LRU list
+
+    }/* else {
+        When the length of the cold clean LRU list is greater than or equal to min_len
+        the page cost of the LRU position of the four LRU lists 
+        is calculated based on the mathematical
+    } */
     struct LLRUNode * node_victim = NULL;
     double min_pc = -1;
 
@@ -152,6 +164,40 @@ struct LLRUNode * get_victim(){
 
     if (node_victim == NULL){
         printf("\n[ERR0] LLRU: No victim found");
+        exit(1);
+    }
+
+    
+    /* The page of minimum Cost is selected as the pending evicting page
+    The pending evicting page may from the hot or cold area, 
+    but the probability that the data in the hot
+    area are accessed again is greater than that of the cold area. 
+    */
+
+    if (node_victim->node->list == hot_clean){ // if the pending evicting page are from the hot clean LRU list
+        //It will be moved to the MRU of the cold clean LRU list
+        list_remove(hot_clean, node_victim->node);
+        LLRU_insert(cold_clean, node_victim);
+        node_victim->references = 1; //and its Cnt will be set to 1.
+        return get_victim();
+
+    }   
+
+    if(node_victim->node->list == hot_dirty){  //The pending victim page coming from the hot dirty area
+        //It will be moved to the MRU of the cold dirty LRU list
+        list_remove(hot_dirty, node_victim->node);
+        LLRU_insert(cold_dirty, node_victim);
+        node_victim->references = 1; //and its Cnt will be set to 1.
+        return get_victim();
+    }
+
+    /*
+    Then repeating entire selection process of victim
+    page until the final evicting page is determined. If the pending victim page is located in cold area, the
+    page will be directly chosen as final victim page.
+    */
+    if( node_victim->node->list != cold_clean && node_victim->node->list != cold_dirty ){
+        printf("\n[ERR0] LLRU: The victim resides in hot area (cold or dirty)");
         exit(1);
     }
 

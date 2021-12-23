@@ -80,6 +80,8 @@
 	#include "buffer_manager/policies/ADLRU.h"
 #elif LLRU
 	#include "buffer_manager/policies/LLRU.h"
+#elif AMLRU
+	#include "buffer_manager/policies/AMLRU.h"
 
 #else /* If no policy has been chosen. Use LRU as default */
 	#include "buffer_manager/policies/LRU.h"

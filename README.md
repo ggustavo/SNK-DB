@@ -46,23 +46,23 @@ gcc src/tests/test_buffer_requests.c -o database -Wall -Wextra
 |`-DCLOCK` |Second Chance (or Clock)          |`gcc (...) -DCLOCK` |
 |`-DGCLOCK`|Generalized Clock (GCLOCK)        |`gcc (...) -DGCLOCK` |
 |`-DMQ`    |Multi queue (MQ)                  |`gcc (...) -DMQ` |
-|`-DARC`   |Adaptive Replacement Cache (ARC) ***(in test phase)***  |`gcc (...) -DARC` |
-|`-DFBR`   |Frequency-Based Replacement (FBR) ***(in test phase)***  |`gcc (...) -DFBR` |
+|`-DARC`   |Adaptive Replacement Cache (ARC)*  |`gcc (...) -DARC` |
+|`-DFBR`   |Frequency-Based Replacement (FBR)*  |`gcc (...) -DFBR` |
 |`-DLRUMIS`   |LRU with Midpoint Insertion Strategy (LRU-MIS) |`gcc (...) -DLRUMIS` |
-|`-DF2Q`   |Full Version “Two Queue” (2Q) ***(in test phase)***  |`gcc (...) -DF2Q` |
-|`-DLRUK`   |Least kth-to-last Reference (LRU-K) ***(in test phase)***  |`gcc (...) -DLRUK` |
-|`-DLIRS`   |Low Inter-reference Recency Set (LIRS) ***(in test phase)***  |`gcc (...) -DLIRS` |
-|`-DCFLRU` |Clean-First LRU (CFLRU) ***(in test phase)***  |`gcc (...) -DCFLRU` |
-|`-DLRUWSR` |LRU Write Sequence Reordering (LRU-WSR) ***(in test phase)***  |`gcc (...) -DLRUWSR` |
-|`-DCCFLRU` |Cold-Clean-First LRU (CCF-LRU) ***(in test phase)***  |`gcc (...) -DCCFLRU` |
-|`-DCCCFLRU` |Controllable Cold Clean First Least Recently Used (CCCF-LRU) ***(in test phase)***  |`gcc (...) -DCCCFLRU` |
-|`-DCFDC` |Clean-First Dirty-Clustered (CFDC) ***(in test phase)***  |`gcc (...) -DCFDC` |
-|`-DCASA` |Cost-Aware Self-Adaptive (CASA) ***(in test phase)***  |`gcc (...) -DCASA` |
-|`-ADLRU` |Adaptive Double LRU (AD-LRU) ***(in test phase)*** |`gcc (...) -ADLRU` |
-|`-LLRU` |Locality-aware Least Recently Used (LLRU) ***(in test phase)*** |`gcc (...) -LLRU` |
+|`-DF2Q`   |Full Version “Two Queue” (2Q)*  |`gcc (...) -DF2Q` |
+|`-DLRUK`   |Least kth-to-last Reference (LRU-K)*  |`gcc (...) -DLRUK` |
+|`-DLIRS`   |Low Inter-reference Recency Set (LIRS)*  |`gcc (...) -DLIRS` |
+|`-DCFLRU` |Clean-First LRU (CFLRU)*  |`gcc (...) -DCFLRU` |
+|`-DLRUWSR` |LRU Write Sequence Reordering (LRU-WSR)*  |`gcc (...) -DLRUWSR` |
+|`-DCCFLRU` |Cold-Clean-First LRU (CCF-LRU)*  |`gcc (...) -DCCFLRU` |
+|`-DCCCFLRU` |Controllable Cold Clean First Least Recently Used (CCCF-LRU)*  |`gcc (...) -DCCCFLRU` |
+|`-DCFDC` |Clean-First Dirty-Clustered (CFDC)*  |`gcc (...) -DCFDC` |
+|`-DCASA` |Cost-Aware Self-Adaptive (CASA)*  |`gcc (...) -DCASA` |
+|`-ADLRU` |Adaptive Double LRU (AD-LRU)* |`gcc (...) -ADLRU` |
+|`-LLRU` |Locality-aware Least Recently Used (LLRU)* |`gcc (...) -LLRU` |
+|`-AMLRU` | AM-LRU* |`gcc (...) -AMLRU` |
 
-
-
+> * ***(in test phase)***
 > **Note:** Use [db_kernel.h](https://github.com/ggustavo/SNK-DB/blob/master/src/dbms/db_kernel.h). If you don't want to use these options
 
 
