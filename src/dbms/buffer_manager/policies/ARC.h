@@ -84,6 +84,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
         
         else {
             printf("\n[ERR0] Why the page is not in T1 or T2 ???");
+            exit(1);
         } 
 
 

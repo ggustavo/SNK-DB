@@ -28,7 +28,7 @@ int W;
  * Initialize the structures used in the page replacement policy here.
  */
 void buffer_policy_start(){
-    W = BUFFER_SIZE / 2;
+    W = MAX(1 , BUFFER_SIZE * 0.1);
     printf("\nBuffer Replacement Policy: %s \nW:%d", __FILE__, W);
     printf("\n---------------------------------------------------------------------------------------------------");
 	

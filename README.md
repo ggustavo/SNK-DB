@@ -58,11 +58,12 @@ gcc src/tests/test_buffer_requests.c -o database -Wall -Wextra
 |`-DCCCFLRU` |Controllable Cold Clean First Least Recently Used (CCCF-LRU)*  |`gcc (...) -DCCCFLRU` |
 |`-DCFDC` |Clean-First Dirty-Clustered (CFDC)*  |`gcc (...) -DCFDC` |
 |`-DCASA` |Cost-Aware Self-Adaptive (CASA)*  |`gcc (...) -DCASA` |
-|`-ADLRU` |Adaptive Double LRU (AD-LRU)* |`gcc (...) -ADLRU` |
-|`-LLRU` |Locality-aware Least Recently Used (LLRU)* |`gcc (...) -LLRU` |
-|`-AMLRU` | AM-LRU* |`gcc (...) -AMLRU` |
+|`-DADLRU` |Adaptive Double LRU (AD-LRU)* |`gcc (...) -DADLRU` |
+|`-DLLRU` |Locality-aware Least Recently Used (LLRU)* |`gcc (...) -DLLRU` |
+|`-DAMLRU` | AM-LRU* |`gcc (...) -DAMLRU` |
+|`-DGASA` | Ghost buffer Assisted and Self-tuning Algorithm (GASA)* |`gcc (...) -DGASA` |
 
-> * ***(in test phase)***
+
 > **Note:** Use [db_kernel.h](https://github.com/ggustavo/SNK-DB/blob/master/src/dbms/db_kernel.h). If you don't want to use these options
 
-
+> \* ***in test phase***
