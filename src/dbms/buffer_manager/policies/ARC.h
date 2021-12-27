@@ -19,7 +19,7 @@ struct List * T2;
 struct List * G1; /* Ghost List G1 */
 struct List * G2; /* Ghost List G2 */
 
-int P; /*  Policy Advisor */
+double P; /*  Policy Advisor */
                                            
 struct GhostPage { /* Ghost page does not store any page data only its metadata */
     int file_id;
@@ -37,7 +37,7 @@ void buffer_policy_start(){
     T2 = list_create(NULL,NULL);
     G1 = list_create(NULL,NULL);
     G2 = list_create(NULL,NULL);
-    P = BUFFER_SIZE / 2;
+    P = (double) BUFFER_SIZE / 2;
     
     printf("\nBuffer Replacement Policy: %s \ninitial Advisor: %d", __FILE__, P);
     printf("\n---------------------------------------------------------------------------------------------------");
@@ -100,7 +100,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 
         if(ghost_node != NULL){ /* Ghost HIT int G1 */
             
-            P = MIN( BUFFER_SIZE, P + MAX( (int) SAFE_DIVISION( G2->size, G1->size), 1) ); /* Adapt p = min{ buffer_size, p + max{ B2.size/B1.size, 1} } */
+            P = MIN( (double) BUFFER_SIZE, P + MAX( (double) SAFE_DIVISION( G2->size, G1->size), 1.0) ); /* Adapt p = min{ buffer_size, p + max{ B2.size/B1.size, 1} } */
              
             list_remove(G1, ghost_node);
             victim = replacement(0, ghost_node); 
@@ -116,7 +116,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
         ghost_node = find_ghost_page(G2, file_id, block_id);
         if(ghost_node != NULL){ /* Ghost HIT int G2 */
             
-            P = MAX( BUFFER_SIZE, P - MAX( (int) SAFE_DIVISION( G1->size, G2->size), 1) ); /* Adapt p = max{ 0, p - max{ B1.size/B2.size, 1} } */
+            P = MAX( (double) BUFFER_SIZE, P - MAX( (double) SAFE_DIVISION( G1->size, G2->size), 1.0) ); /* Adapt p = max{ 0, p - max{ B1.size/B2.size, 1} } */
             
             list_remove(G2, ghost_node);
             victim = replacement(1, ghost_node); /* X E G2 == 1 */
@@ -199,7 +199,8 @@ struct Node * replacement(int x_E_G2, struct Node * ghost_node){
     struct Node * victim = NULL;
     struct Page * page = NULL;
     struct GhostPage * g_page = NULL;
-    if(T1->size >= 1 && ( (x_E_G2 == 1 && T1->size == P) || T1->size > P)) { /* if (|T1| ≥ 1) and ((x ∈ G2 and |T1| = p) or (|T1| > p)) */
+    
+    if(T1->size >= 1 && ( (x_E_G2 == 1 && (double) T1->size == P) || ((double) T1->size > P) )) { /* if (|T1| ≥ 1) and ((x ∈ G2 and |T1| = p) or (|T1| > p)) */
         victim = remove_LRU(T1);
         page = (struct Page * ) victim->content;
         g_page = (struct GhostPage *) ghost_node->content; 
