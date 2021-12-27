@@ -84,6 +84,9 @@
 	#include "buffer_manager/policies/AMLRU.h"
 #elif GASA
 	#include "buffer_manager/policies/GASA.h"
+#elif SCMBP
+	#include "buffer_manager/policies/SCMBP.h"
+	
 
 #else /* If no policy has been chosen. Use LRU as default */
 	#include "buffer_manager/policies/LRU.h"

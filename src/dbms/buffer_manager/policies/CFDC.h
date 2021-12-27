@@ -61,7 +61,7 @@ void buffer_policy_start(){
     working_region_size = BUFFER_SIZE / 2;
     priority_region_size = BUFFER_SIZE - working_region_size;
     GC = 0;
-    MAX_CLUSTER_SIZE = 2; // 16, 64
+    MAX_CLUSTER_SIZE = 16; // 16, 64
 
     printf("\nBuffer Replacement Policy: %s\nWorking Region: %d Priority Region: %d Elements per Cluster: %d", __FILE__, working_region_size ,priority_region_size ,MAX_CLUSTER_SIZE);
     printf("\n---------------------------------------------------------------------------------------------------");
