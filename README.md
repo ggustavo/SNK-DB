@@ -62,7 +62,7 @@ gcc src/tests/test_buffer_requests.c -o database -Wall -Wextra
 |`-DLLRU` |Locality-aware Least Recently Used (LLRU)* |`gcc (...) -DLLRU` |
 |`-DAMLRU` | AM-LRU* |`gcc (...) -DAMLRU` |
 |`-DGASA` | Ghost buffer Assisted and Self-tuning Algorithm (GASA)* |`gcc (...) -DGASA` |
-
+|`-SCMBP` | SCMBP-SCCW* |`gcc (...) -SCMBP` |
 
 > **Note:** Use [db_kernel.h](https://github.com/ggustavo/SNK-DB/blob/master/src/dbms/db_kernel.h). If you don't want to use these options
 

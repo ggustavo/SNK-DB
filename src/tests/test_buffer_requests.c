@@ -59,11 +59,12 @@ int main(void) { //gcc src/tests/test_buffer_requests.c -o database -Wall -Wextr
     
     while (fscanf(file, "%c[%d-%d]\n", &operation, &data_file_id, &block_id) > 0) {
         
-        printf("\nRequest ---> %c[%d-%d]", operation, map_file_id(data_file_id)->file_id, block_id);		
+        if(DEBUG == TRUE) printf("\nRequest ---> %c[%d-%d]", operation, map_file_id(data_file_id)->file_id, block_id);		
         
         if(operation == 'R')buffer_request_page( map_file_id(data_file_id)->file_id, block_id, READ_REQUEST);
         if(operation == 'W')buffer_request_page( map_file_id(data_file_id)->file_id, block_id, WRITE_REQUEST);
-        buffer_print_policy();
+        
+        if(DEBUG == TRUE) buffer_print_policy();
     }  
 
     gettimeofday(&end_time, NULL); // End Time

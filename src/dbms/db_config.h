@@ -100,12 +100,20 @@ char CATALOG_SCHEMAS_FOLDER[] = "data/schemas";
 	#define xmkdir(path) mkdir(path, 0777); /* -DWIN to compile on Windows (warning: is not stable) */
 #endif
 
+
+#ifndef DEBUG
+	#define DEBUG FALSE
+#endif
+
+
 void debug(const char *format, ...) {
-    va_list vl;
-    va_start(vl, format);
-    vprintf(format, vl);
+    if(DEBUG == TRUE){
+        va_list vl;
+        va_start(vl, format);
+        vprintf(format, vl);
     //-------------> printf(format, vl); 
-    va_end(vl);
+        va_end(vl);
+    }
 }
 
 

@@ -7,3 +7,4 @@ Release
 .settings
 .vscode
 *.exe
+result.json

@@ -487,7 +487,7 @@ double SCMBP_priority_function(struct Cluster * cluster){
 
     if(node == NULL){
         IPD = 1;
-        return 1; //// ---------------->
+        return 1; //// ----------------> return 1??????
     }
 
     int n_2 = cluster->list->size * cluster->list->size; 

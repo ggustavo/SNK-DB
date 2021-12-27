@@ -3,6 +3,7 @@
 #include <sys/time.h>
 #include "../dbms/db_kernel.h"
 #include "../dbms/file_manager/data_file.h"
+#include "../dbms/db_export_json.h"
 
 
 struct DataFile * warehouse;
@@ -56,9 +57,9 @@ int main(void) { //gcc src/tests/test_buffer_requests.c -o database -Wall -Wextr
 
  
 	gettimeofday(&start_time, NULL); // Start Time
-
     while (fscanf(file, "%c;%d\n", &operation, &block_id) > 0) {
-        
+       
+       
         //printf("\nRequest ---> %c[%d-%d]", operation, map_file_id(data_file_id)->file_id, block_id);		
         
         if(operation == 'R')buffer_request_page( map_file_id(data_file_id)->file_id, block_id, READ_REQUEST);
@@ -71,8 +72,13 @@ int main(void) { //gcc src/tests/test_buffer_requests.c -o database -Wall -Wextr
     //buffer_flush(); 
 	buffer_print_statistics();
     // Show Execution Time in Seconds
-    printf("\nExecution Time = %f seconds\n",(double) (end_time.tv_usec - start_time.tv_usec) / 1000000 + (double) (end_time.tv_sec - start_time.tv_sec));
+    double time =  ( ((double) ((double)end_time.tv_usec - (double)start_time.tv_usec)) / 1000000 ) +  ( (double) ((double)end_time.tv_sec - (double)start_time.tv_sec) )  ;
+    
+    printf("\nExecution Time = %f seconds\n", time);
 
+    
+    
+    export_json_final_result(BUFFER_POLICY_NAME, BUFFER_SIZE, flush_operations, hit_operations, time);
 	//printf("\nPress Any Key to Exit\n");
 	//getchar();
 	return 0;

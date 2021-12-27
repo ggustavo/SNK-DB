@@ -18,10 +18,10 @@ int catalog_access_directory(char * path){
 	 int dir = xmkdir(path);  
 	//int dir = mkdir(path, 0777);
 	if(dir == 0 ){
-		printf("\nCatalog - [CREATE %d] %s",dir, path );
+		if(DEBUG == TRUE) printf("\nCatalog - [CREATE %d] %s",dir, path );
 		return CREATED;
 	}else{
-		printf("\nCatalog - [OPEN %d] %s", dir, path );
+		if(DEBUG == TRUE) printf("\nCatalog - [OPEN %d] %s", dir, path );
 		return OPENED;
 	}
 	return dir;
