@@ -103,7 +103,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 
 			struct Node * lru_node = NULL;
 
-            if( (double) C->size >= advisor){ // Using >= if the adivsor is equals the BUFFER_SIZE and D is empty
+            if( (double) C->size >= advisor && C->size > 0){ // Using >= if the adivsor is equals the BUFFER_SIZE and D is empty
                 lru_node = remove_LRU(C);
             }else{
                 lru_node = remove_LRU(D);
