@@ -65,9 +65,12 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
         if(ccflru_node->node->list == cold_clean){
             list_remove(cold_clean, ccflru_node->node);
             CCFLRU_insert(mixed_list, ccflru_node);
-        }else{
+        }else if(ccflru_node->node->list == mixed_list){
             list_remove(mixed_list, ccflru_node->node);
             CCFLRU_insert(mixed_list, ccflru_node);
+        }else{
+            printf("\nERROR: The node is not in the cold_clean or miexed list");
+            exit(1);
         }
 
 
@@ -129,32 +132,46 @@ struct CCFLRUNode * get_dirty_victim(){
     struct Node * node = mixed_list->tail;
     struct CCFLRUNode * victim = ((struct CCFLRUNode *) node->content);
     struct Page * page = victim->page;
-        
+
+    if(node == NULL){
+        printf("\n[ERR0]: mixed list is empty");
+        exit(1);
+    }
+
+    if(page == NULL){
+        printf("\n[ERR0]: page is NULL");
+        exit(1);
+    }
+
     if(victim->cold_bit == 1){ // If the LRU page has a cold bit equal to 1
-            return victim; //evicted regardless of whether it is dirty or clean
-    }else{ // cold bit equal to 0
-        
+        return victim; //evicted regardless of whether it is dirty or clean
+    }
+
+    while(victim->cold_bit == 0){
+
         if(page->dirty_flag == PAGE_CLEAN){ // If the LRU page is clean
             list_remove(mixed_list, node); //second chance
             CCFLRU_insert( cold_clean, victim); //page is moved to the MRU side of the cold clean list
             victim->cold_bit = 1; // and the cold bit is set to 1
-            return get_dirty_victim(); //recursive call
         }else{ // If the LRU page is dirty
+
             list_remove(mixed_list, node); //second chance
             CCFLRU_insert( mixed_list, victim); //page is moved to the MRU side of the mixed list
             victim->cold_bit = 1; // and the cold bit is set to 1
-            return get_dirty_victim(); //recursive call
         }
-            
-            
-    }
 
+        node = mixed_list->tail;
+        victim = ((struct CCFLRUNode *) node->content);
+        page = victim->page;
+
+    }
+    
     if(victim == NULL){
         printf("\n[ERR0] victim is NULL");
         exit(1);
     }
 
-    return NULL;
+    return victim;
 }
 
 void CCFLRU_insert(struct List * list, struct CCFLRUNode * ccflru_node){
@@ -196,3 +213,44 @@ void buffer_print_policy(){
 }
 
 #endif
+
+
+/* RECURSIVE VERSION
+struct CCFLRUNode * get_dirty_victim(){
+    
+    struct Node * node = mixed_list->tail;
+    struct CCFLRUNode * victim = ((struct CCFLRUNode *) node->content);
+    struct Page * page = victim->page;
+
+    if(node == NULL){
+        printf("\n[ERR0]: mixed list is empty");
+        exit(1);
+    }    
+       
+    if(victim->cold_bit == 1){ // If the LRU page has a cold bit equal to 1
+            return victim; //evicted regardless of whether it is dirty or clean
+    }else{ // cold bit equal to 0
+        
+        if(page->dirty_flag == PAGE_CLEAN){ // If the LRU page is clean
+            list_remove(mixed_list, node); //second chance
+            CCFLRU_insert( cold_clean, victim); //page is moved to the MRU side of the cold clean list
+            victim->cold_bit = 1; // and the cold bit is set to 1
+            return get_dirty_victim(); //recursive call
+        }else{ // If the LRU page is dirty
+            list_remove(mixed_list, node); //second chance
+            CCFLRU_insert( mixed_list, victim); //page is moved to the MRU side of the mixed list
+            victim->cold_bit = 1; // and the cold bit is set to 1
+            return get_dirty_victim(); //recursive call
+        }
+            
+            
+    }
+
+    if(victim == NULL){
+        printf("\n[ERR0] victim is NULL");
+        exit(1);
+    }
+
+    return NULL;
+}
+*/
