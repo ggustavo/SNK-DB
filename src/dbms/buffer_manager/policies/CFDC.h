@@ -234,7 +234,7 @@ double CFDC_priority_function(struct Cluster * cluster){
         struct CFDCNode * prev_cfdc_node = (struct CFDCNode *) node->prev->content;
         int prev_page_id = CFDC_page_id(prev_cfdc_node->page);
 
-        IPD = IPD + ABS(page_id - prev_page_id);
+        IPD = IPD + ABS( (page_id - prev_page_id) );
 
         node = node->next;
     }
@@ -392,7 +392,7 @@ int CFDC_page_id(struct Page * page){
     //Use Cantor pairing function to get the cluster id
     //(a + b) * (a + b + 1) / 2 + a; where a, b >= 0
     //int page_id = (page->file_id + page->block_id) * (page->file_id + page->block_id + 1) / 2 + page->block_id;
-    return page->block_id;
+    return (int) page->block_id;
 }
 
 int CFDC_cluster_id(struct Page * page){

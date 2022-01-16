@@ -111,6 +111,9 @@
 #elif SCMBP
 	#include "buffer_manager/policies/SCMBP.h"
 	#define BUFFER_POLICY_NAME  "SCMBP"
+#elif ML1
+	#include "buffer_manager/policies/ML1.h"
+	#define BUFFER_POLICY_NAME  "ML1"
 	
 
 #else /* If no policy has been chosen. Use LRU as default */
