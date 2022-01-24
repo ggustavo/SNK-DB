@@ -30,8 +30,8 @@ double CW; // Cost of Write
  */
 void buffer_policy_start(){
     advisor = (double) BUFFER_SIZE / 2;
-    CR = 0.5;
-    CW = 0.5;
+    CR = 0.001;
+    CW = 0.128;
 
     printf("\nBuffer Replacement Policy: %s \nCR: %f CW: %f", __FILE__, CR, CW);
     printf("\n---------------------------------------------------------------------------------------------------");

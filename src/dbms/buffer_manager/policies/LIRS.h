@@ -45,10 +45,10 @@ void print_LIRS_page(struct LIRSNode * node);
  * Initialize the structures used in the page replacement policy here.
  */
 void buffer_policy_start(){
-    //LIR_size = BUFFER_SIZE * 0.99; // 99%
-    //HIR_size = BUFFER_SIZE - LIR_size; // 1%
-    LIR_size = BUFFER_SIZE - 2; 
-    HIR_size = BUFFER_SIZE - LIR_size; 
+    LIR_size = BUFFER_SIZE * 0.99; // 99%
+    HIR_size = BUFFER_SIZE - LIR_size; // 1%
+    //LIR_size = BUFFER_SIZE - 2; 
+    //HIR_size = BUFFER_SIZE - LIR_size; 
     printf("\nBuffer Replacement Policy: %s \nLIRs: %d HIRs: %d", __FILE__, LIR_size, HIR_size);
     printf("\n---------------------------------------------------------------------------------------------------");
 	

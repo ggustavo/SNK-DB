@@ -55,7 +55,7 @@ struct MQNode * EvictBlock();
  */
 void buffer_policy_start(){
     currentTime = 0;
-    lifeTime = BUFFER_SIZE / 2;
+    lifeTime = 40;
     M = 8;
     Qout_size = BUFFER_SIZE * 4; /*  The history buffer Qout size is set to be four time of the number of blocks in the cache */
 

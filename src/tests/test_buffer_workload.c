@@ -28,7 +28,15 @@ struct DataFile * map_file_id(int file_id){
 }
 
  
-int main(void) { //gcc src/tests/test_buffer_requests.c -o database -Wall -Wextra
+int main(int argc, char *argv[]) {
+
+    if (argc <= 1 ){
+        printf("[ERR0] Missing parameters\n");
+        return 1;
+    }
+
+    char * result_file = catalog_append_path(2, argv[1], ".js");
+    printf("\n path: %s\n", argv[2]);
 
 	start_database();
     
@@ -49,13 +57,16 @@ int main(void) { //gcc src/tests/test_buffer_requests.c -o database -Wall -Wextr
 	int data_file_id = 11;
     int block_id;
        
-    FILE * file = fopen("C:\\Users\\Gustavo\\Desktop\\workloads\\workloadGerado---zipf-15m-a1-n1m-80w-no-burst.txt", "r");
+    //FILE * file = fopen("C:\\Users\\Gustavo\\Desktop\\workloads\\workloadGerado---zipf-15m-a1-n1m-80w-no-burst.txt", "r");
+    //FILE * file = fopen("C:\\Users\\Gustavo\\Desktop\\workloads\\TPCE-Trace-3M.txt", "r");
+    FILE * file = fopen(argv[2], "r");
+
     if (file == NULL) {
 		printf("\n workload not found \n");
         return -1;
 	}    
 
- 
+
 	gettimeofday(&start_time, NULL); // Start Time
     while (fscanf(file, "%c;%d\n", &operation, &block_id) > 0) {
        
@@ -78,7 +89,7 @@ int main(void) { //gcc src/tests/test_buffer_requests.c -o database -Wall -Wextr
 
     
     
-    export_json_final_result(BUFFER_POLICY_NAME, BUFFER_SIZE, flush_operations, hit_operations, time);
+    export_json_final_result(result_file ,BUFFER_POLICY_NAME, BUFFER_SIZE, flush_operations, hit_operations, time);
 	//printf("\nPress Any Key to Exit\n");
 	//getchar();
 	return 0;
