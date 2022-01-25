@@ -13,8 +13,9 @@
 #include <stdio.h>
 #include "../db_buffer.h"
 #include "../../db_config.h"
-#include <math.h> // to use LOG function
+#include "../../util/hash_table.h"
 #define _USE_MATH_DEFINES
+#include <math.h> // to use LOG function
 
 unsigned long long int currentTime;
 unsigned long long int lifeTime;
@@ -23,6 +24,7 @@ int M; /*  number of queues! */
 
 struct List ** Queues;
 struct List * Qout;
+struct Hash * mq_hash;
 
 int Qout_size;
 
@@ -69,6 +71,8 @@ void buffer_policy_start(){
     for(int k = 0; k < M; k++){
         Queues[k] = list_create(buffer_print_page,NULL);
     }
+    
+    mq_hash = hash_table_create(BUFFER_SIZE*4);
 }
 
 struct Page * buffer_request_page(int file_id, long block_id, char operation){
@@ -101,14 +105,24 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             struct MQNode * victim = EvictBlock(); 
             
             list_remove(Qout, ghost->node);           /* Removes hitted ghost */
-            /* We reuse the hitted ghost structure and update the victim's information on it */
+            
+            //--- HASH GHOST CACHE
+            hash_table_free_entity(
+                hash_table_remove(mq_hash, ( (unsigned int) ghost->block_id ))
+            );
+            //--- HASH GHOST CACHE
+            
+            /* reuse the hitted ghost structure and update the victim's information on it */
             ghost->file_id  = victim->page->file_id;  /* Update file_id */
             ghost->block_id = victim->page->block_id; /* Update block_id */
             ghost->reference = victim->reference;     /* Udate reference */
             insert_MRU(Qout, ghost->node);            /* Insert "new Ghost" */ 
            
+            //--- HASH GHOST CACHE
+            hash_table_put(mq_hash, ( (unsigned int) ghost->block_id ), ghost);
+            //--- HASH GHOST CACHE
 
-            /* We reuse the victim structure */
+            /*reuse the victim structure */
             page = buffer_reset_page(victim->page);
             buffer_load_page(file_id, block_id, page);   /* Read the data from storage media */
             victim->reference = references;              /* Don't forget the hitted ghost reference counter */
@@ -141,6 +155,11 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
                 ghost = create_ghost_page();
             }else{
                 ghost = (struct MQGhostNode *) remove_LRU(Qout)->content;
+                //--- HASH GHOST CACHE
+                hash_table_free_entity(
+                    hash_table_remove(mq_hash, ( (unsigned int) ghost->block_id ))
+                );
+                //--- HASH GHOST CACHE
             }
 
             ghost->file_id  = victim->page->file_id;  /* Update file_id */
@@ -148,6 +167,9 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             ghost->reference = victim->reference;     /* Udate reference */
             insert_MRU(Qout, ghost->node);            /* Insert "new Ghost" */
 
+            //--- HASH GHOST CACHE
+            hash_table_put(mq_hash, ( (unsigned int) ghost->block_id ), ghost);
+            //--- HASH GHOST CACHE
             
             page = victim->page;
 			buffer_load_page(file_id, block_id, page); /* Read new data from storage media */
@@ -232,7 +254,7 @@ struct MQGhostNode * create_ghost_page(){
     ghost->node = list_create_node(ghost);
     return ghost;
 }
-
+/*
 struct MQGhostNode * find_ghost_node(struct List * list, int file_id, int block_id){
     struct Node * x = list->head;
         while(x != NULL){
@@ -243,6 +265,16 @@ struct MQGhostNode * find_ghost_node(struct List * list, int file_id, int block_
             x = x->next;
         }
     return NULL;
+}
+*/
+
+struct MQGhostNode * find_ghost_node(struct List * list, int file_id, int block_id){
+    
+    struct Entity * entity = hash_table_get(mq_hash, ( (unsigned int) block_id ));
+    if(entity == NULL){
+        return NULL;
+    }
+    return (struct MQGhostNode *) entity->value;
 }
 
 

@@ -14,11 +14,13 @@
 #include <stdio.h>
 #include "../db_buffer.h"
 #include "../../db_config.h"
+#include "../../util/hash_table.h"
 
 
 
 struct List * stack_s;
 struct List * list_q;
+struct Hash * lirs_hash;
 
 int LIR_size;
 int HIR_size;
@@ -54,6 +56,10 @@ void buffer_policy_start(){
 	
     stack_s = list_create(NULL,NULL);
     list_q =  list_create(NULL,NULL);
+
+    //lirs_hash = hash_table_create(BUFFER_SIZE * 0.1);
+    lirs_hash = hash_table_create(BUFFER_SIZE);
+    
 }
 
 struct Page * buffer_request_page(int file_id, long block_id, char operation){
@@ -150,6 +156,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
                 list_insert_node_head(list_q, lirs_node->node_list_q);
             } 
             
+            hash_table_put(lirs_hash, ( (unsigned int) page->block_id ), lirs_node);
 
 		} else { /*  Need a replacement */
            
@@ -159,7 +166,6 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             struct LIRSNode * node_victim = get_victim(); // Tail page of list Q as the victim
             struct Page * victim = node_victim->page;
             
-
             list_remove(list_q, node_victim->node_list_q);
 
             if (node_victim->node_stack_s != NULL) { // If this page also resides in stack S
@@ -171,6 +177,11 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
                 list_free_node(list_q, node_victim->node_list_q);
                 node_victim->node_list_q = NULL;
             }else{
+                
+                hash_table_free_entity(
+                    hash_table_remove(lirs_hash, ( (unsigned int) victim->block_id ))
+                );
+
                 list_free_node(list_q, node_victim->node_list_q);
                 node_victim->node_list_q = NULL;
                 node_victim->page = NULL;
@@ -220,6 +231,9 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
                 new_node->status = HIR;    
                 list_insert_node_head(stack_s, new_node->node_stack_s);
                 list_insert_node_head(list_q, new_node->node_list_q);
+                
+                hash_table_put(lirs_hash, ( (unsigned int) page->block_id ), new_node);
+           
             }
             
             
@@ -232,6 +246,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 		}
 
 	}
+
 	set_dirty(page, operation);
 	return page;
 }
@@ -243,7 +258,7 @@ struct LIRSNode * get_victim(){
     
     return victim;
 }
-
+/*
 struct LIRSNode * find_ghost(int file_id, int block_id){
     struct Node * x = stack_s->head;
     while(x!=NULL){
@@ -263,6 +278,18 @@ struct LIRSNode * find_ghost(int file_id, int block_id){
     }
     return NULL;
 }
+*/
+
+
+struct LIRSNode * find_ghost(int file_id, int block_id){
+    
+    struct Entity * entity = hash_table_get(lirs_hash, ( (unsigned int) block_id ));
+    if(entity == NULL){
+        return NULL;
+    }
+    return (struct LIRSNode *) entity->value;
+}
+
 
 void stack_pruning(){
     struct Node * x = stack_s->tail;
@@ -280,6 +307,9 @@ void stack_pruning(){
                 printf("\n[ERR0] ghost node with no NULL page");
                 exit(1);
             }
+            hash_table_free_entity(
+                hash_table_remove(lirs_hash, ( (unsigned int) lirs_node->g_block_id ))
+            );
             free(lirs_node);
         }
 
@@ -304,6 +334,10 @@ struct LIRSNode * LIRS_create_node(struct Page * page){
     return lirs_node;
 }
 
+int hash_print(int key, void * value ){
+    print_LIRS_page((struct LIRSNode *) value);
+}
+
 void buffer_print_policy(){
   
     struct Node * x = stack_s->head;
@@ -322,6 +356,8 @@ void buffer_print_policy(){
         x = x->next;
     }
     printf(" ->");
+
+    hash_table_print(lirs_hash, hash_print);
     
 }
 
