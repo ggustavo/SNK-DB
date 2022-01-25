@@ -14,6 +14,7 @@
 #include "../db_buffer.h"
 #include "../../db_config.h"
 #include <math.h> // to use LOG function
+#define _USE_MATH_DEFINES
 
 unsigned long long int currentTime;
 unsigned long long int lifeTime;
@@ -182,8 +183,9 @@ struct MQNode * EvictBlock(){
 
 int QueueNum(int reference){
     
-    int queue = MIN( log2(reference), M - 1 );
+    //int queue = MIN( log2(reference), M - 1 );
 
+    int queue = MIN( ( log(reference) * M_LOG2E ), M - 1 ); // C90 support
     debug("\n --> Sent to List: %d", queue);
     return queue;
 }
