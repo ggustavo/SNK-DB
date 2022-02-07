@@ -114,7 +114,10 @@
 #elif ML1
 	#include "buffer_manager/policies/ML1.h"
 	#define BUFFER_POLICY_NAME  "ML1"
-	
+
+#elif ML2
+	#include "buffer_manager/policies/ML2.h"
+	#define BUFFER_POLICY_NAME  "ML2"	
 
 #else /* If no policy has been chosen. Use LRU as default */
 	#include "buffer_manager/policies/LRU.h"

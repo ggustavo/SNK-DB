@@ -74,8 +74,10 @@ struct Entity * hash_table_create_entity(unsigned int key, void * value){
 
 
 void hash_table_free_entity(struct Entity * entity){
-    entity->value = NULL;
-    free(entity);
+    if(entity != NULL){
+        entity->value = NULL;
+        free(entity);
+    }
 }
 
 /*
