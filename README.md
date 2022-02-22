@@ -45,7 +45,7 @@ gcc src/tests/test_buffer_requests.c -o database -Wall -Wextra
 |`-DLFUDA` |Least Frequently Used with Dynamic Aging (LFU-DA)       |`gcc (...) -DLFUDA` |
 |`-DCLOCK` |Second Chance (or Clock)          |`gcc (...) -DCLOCK` |
 |`-DGCLOCK`|Generalized Clock (GCLOCK)        |`gcc (...) -DGCLOCK` |
-|`-DMQ`    |Multi queue (MQ)                  |`gcc (...) -DMQ` |
+|`-DMQ`    |Multi Queue (MQ)                  |`gcc (...) -DMQ` |
 |`-DARC`   |Adaptive Replacement Cache (ARC)*  |`gcc (...) -DARC` |
 |`-DFBR`   |Frequency-Based Replacement (FBR)*  |`gcc (...) -DFBR` |
 |`-DLRUMIS`   |LRU with Midpoint Insertion Strategy (LRU-MIS) |`gcc (...) -DLRUMIS` |
