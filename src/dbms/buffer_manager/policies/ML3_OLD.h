@@ -1,5 +1,7 @@
 /*
-
+ * (AM-LRU)
+ * Reference Paper:
+ * - A Multiple LRU List Buffer Management Algorithm (2019)
  */
 #ifndef POLICY_H_INCLUDED
 #define POLICY_H_INCLUDED
@@ -9,7 +11,6 @@
 #include "../db_buffer.h"
 #include "../../db_config.h"
 #include "../../util/hash_table.h"
-
 
 /*
 *                                                -- NEW Structure --
@@ -32,6 +33,8 @@ struct List * cold_clean;
 struct List * cold_dirty;
 
 struct List * ghost_list;
+struct List * historic_list_in;
+struct List * historic_list_out;
 
 struct Hash * ghost_hash;
 
@@ -109,8 +112,6 @@ struct HistoricNodeOut{
     struct Node * node;
 };
 
-struct HistoricNodeIn ** historic_in;
-struct List * historic_list_out;
 
 struct MLNode * NEW_create_node(struct Page * page);
 void NEW_insert(struct List * list, struct MLNode * node);
@@ -125,13 +126,14 @@ void add_historic_out(struct MLNode * ml_node, struct HistoricNodeOut * ghost);
 void buffer_print_policy_historic_in();
 void buffer_print_policy_historic_out();
 double calc_score(struct MLNode * node);
-void * analyze(void * arg);
+void analyze();
 double reward(double x);
 double punish(double x);
 
 struct HistoricNodeOut * find_ghost(int file_id, long block_id);
 
 struct HistoricNodeOut * aux = NULL;
+
 
 
 /*
@@ -171,7 +173,7 @@ void buffer_policy_start(){
     cold_clean = list_create(NULL,NULL);
     cold_dirty = list_create(NULL,NULL);
     ghost_list = list_create(NULL,NULL);
-    historic_in = (struct HistoricNodeIn **) malloc(historic_size_in * sizeof(struct HistoricNodeIn*));
+    historic_list_in = list_create(NULL,NULL);
     historic_list_out = list_create(NULL,NULL);
     ghost_hash = hash_table_create(BUFFER_SIZE);
 
@@ -180,7 +182,8 @@ void buffer_policy_start(){
         h_node->file_id = -1;
         h_node->block_id = -1;
         h_node->dirty_flag = '-';
-        historic_in[i] = h_node;
+        struct Node * node = list_create_node(h_node);
+        list_insert_node_head(historic_list_in, node);
     }
 
     for(int i = 0; i < historic_size_out; i++){
@@ -276,12 +279,10 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             }
 
 
-            /*
-            if(  GC > 0 &&  ( GC % 100 == 0 ) ){
-                analyze(NULL);  
-            }
-            */
             
+            if(  GC > 0 ||  ( GC % 100 == 0 ) ){
+                analyze();  
+            }
 
             struct MLNode * node_victim = get_victim();
             list_remove(node_victim->node->list, node_victim->node);
@@ -554,12 +555,9 @@ struct MLNode * get_victim(){
 }
 
 
-
-
-
-void * analyze(void * arg){
+void analyze(){
    
-
+    struct Node * x = historic_list_in->tail;
     int write_counter = 0;
     int read_counter = 0;
     int count = 0;
@@ -574,8 +572,8 @@ void * analyze(void * arg){
 
     max_page_frequency_interval = 0;
 
-    for (int i = 0; i < historic_size_in; i++){
-        struct HistoricNodeIn * n = historic_in[i];
+    while(x != NULL){
+        struct HistoricNodeIn * n = (struct HistoricNodeIn *) x->content;
         if(n->file_id == -1) break;
         
         // READ and WRITE intensity
@@ -600,6 +598,7 @@ void * analyze(void * arg){
         
       
         count++;
+        x = x->prev;
     }
     write_intensity =  ( (write_counter * 100.0 ) / (double) count ) / 100.0;
     read_intensity =   ( (read_counter * 100.0 ) / (double) count ) / 100.0;
@@ -617,16 +616,12 @@ void * analyze(void * arg){
     read_hit_intensity = ( (read_count_hit * 100.0 ) / (double) count) / 100.0;
     
     //printf("\n W:%f R:%f", write_intensity, read_intensity);
-    return NULL;
+
 }
 
-int postion_IN = 0;
-
 void add_historic_in(struct Page * page, double references, int is_hit, int is_miss, int is_ghost_hit){
-    if(postion_IN == historic_size_in){
-        postion_IN = 0; //reset
-    }
-    struct HistoricNodeIn * h_node = historic_in[postion_IN];
+    struct Node * free_n = list_remove_tail(historic_list_in);
+    struct HistoricNodeIn * h_node = (struct HistoricNodeIn *) free_n->content;
     h_node->file_id = page->file_id;
     h_node->block_id = page->block_id;
     h_node->dirty_flag = page->dirty_flag;
@@ -634,8 +629,7 @@ void add_historic_in(struct Page * page, double references, int is_hit, int is_m
     h_node->is_miss = is_miss;
     h_node->is_ghost_hit = is_ghost_hit;
     h_node->references = references;
-    postion_IN ++;
-    
+    list_insert_node_head(historic_list_in, free_n);
 }
 
 void add_historic_out(struct MLNode * ml_node, struct HistoricNodeOut * ghost){
@@ -734,15 +728,13 @@ void buffer_print_policy(){
 }
 
 void buffer_print_policy_historic_in(){
-    printf("\nIN:");
-    /* TO DO
     struct Node * x = historic_list_in->tail;
+    printf("\nIN:");
     while(x!=NULL){
         struct HistoricNodeIn * n = (struct HistoricNodeIn *) x->content;
         printf(" %c[%d-%ld]",n->dirty_flag, n->file_id, n->block_id);
         x = x->prev;
     }
-    */
 }
 
 

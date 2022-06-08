@@ -4,7 +4,8 @@
 #include "../dbms/db_kernel.h"
 #include "../dbms/file_manager/data_file.h"
 #include "../dbms/db_export_json.h"
-
+#include <pthread.h>
+#include <unistd.h>
 
 struct DataFile * warehouse;
 struct DataFile * district;
@@ -27,43 +28,19 @@ struct DataFile * map_file_id(int file_id){
        return NULL;
 }
 
- 
-int main(int argc, char *argv[]) {
+char * workload_test;
+char * result_file_test;
 
-    if (argc <= 1 ){
-        printf("[ERR0] Missing parameters\n");
-        return 1;
-    }
-
-    char * result_file = catalog_append_path(2, argv[1], ".js");
-    printf("\n path: %s\n", argv[2]);
-
-	start_database();
-    
-    //------------------ Initializing data files -----------------
-    warehouse  = data_file_open("warehouse",  CATALOG_DATA_FOLDER);
-    district   = data_file_open("district",   CATALOG_DATA_FOLDER);
-    customer   = data_file_open("customer",   CATALOG_DATA_FOLDER);
-    history    = data_file_open("history",    CATALOG_DATA_FOLDER);
-    new_order  = data_file_open("new_order",  CATALOG_DATA_FOLDER);
-    order      = data_file_open("order",      CATALOG_DATA_FOLDER);
-    order_line = data_file_open("order_line", CATALOG_DATA_FOLDER);
-    stock      = data_file_open("stock",      CATALOG_DATA_FOLDER);
-    //-------------------------------------------------------------
-    printf("\n---------------------------------------------------------------\n");
-    
+void * buffer(void * arg){
     struct timeval start_time, end_time;
     char operation;
 	int data_file_id = 11;
     int block_id;
-       
-    //FILE * file = fopen("C:\\Users\\Gustavo\\Desktop\\workloads\\workloadGerado---zipf-15m-a1-n1m-80w-no-burst.txt", "r");
-    //FILE * file = fopen("C:\\Users\\Gustavo\\Desktop\\workloads\\TPCE-Trace-3M.txt", "r");
-    FILE * file = fopen(argv[2], "r");
+    FILE * file = fopen(workload_test, "r");
 
     if (file == NULL) {
 		printf("\n workload not found \n");
-        return -1;
+        return NULL;
 	}    
 
 
@@ -87,10 +64,64 @@ int main(int argc, char *argv[]) {
     
     printf("\nExecution Time = %f seconds\n", time);
 
-    
-    
-    export_json_final_result(result_file ,BUFFER_POLICY_NAME, BUFFER_SIZE, flush_operations, hit_operations, time);
+
+    export_json_final_result(result_file_test ,BUFFER_POLICY_NAME, BUFFER_SIZE, flush_operations, hit_operations, time);
 	//printf("\nPress Any Key to Exit\n");
 	//getchar();
+    return NULL;
+}
+
+int ANALYZE_THREAD_FLAG = 1;
+
+void * analyze_thread(void * arg){
+    int iternal = 0;
+    while (ANALYZE_THREAD_FLAG == 1) {
+        //printf("\nAnalyze Thread ...");
+         #ifdef ML3
+            //if(GC > iternal + 50){
+                analyze(NULL); 
+                //iternal = GC; 
+           // }
+        #endif
+        //sleep(0.0001);
+    }
+    return NULL;
+}
+
+int main(int argc, char *argv[]) {
+
+    if (argc <= 1 ){
+        printf("[ERR0] Missing parameters\n");
+        return 1;
+    }
+
+    char * result_file = catalog_append_path(2, argv[1], ".js");
+    printf("\n path: %s\n", argv[2]);
+
+	start_database();
+    
+    //------------------ Initializing data files -----------------
+    warehouse  = data_file_open("warehouse",  CATALOG_DATA_FOLDER);
+    district   = data_file_open("district",   CATALOG_DATA_FOLDER);
+    customer   = data_file_open("customer",   CATALOG_DATA_FOLDER);
+    history    = data_file_open("history",    CATALOG_DATA_FOLDER);
+    new_order  = data_file_open("new_order",  CATALOG_DATA_FOLDER);
+    order      = data_file_open("order",      CATALOG_DATA_FOLDER);
+    order_line = data_file_open("order_line", CATALOG_DATA_FOLDER);
+    stock      = data_file_open("stock",      CATALOG_DATA_FOLDER);
+    //-------------------------------------------------------------
+    printf("\n---------------------------------------------------------------\n");
+    workload_test = argv[2];
+    result_file_test = result_file;
+
+    pthread_t workload_th;
+    pthread_t analyze_th;
+    
+    pthread_create(&workload_th, NULL, buffer, NULL);
+    pthread_create(&analyze_th, NULL, analyze_thread, NULL);
+
+    pthread_join(workload_th, NULL);
+    ANALYZE_THREAD_FLAG = 0;
+    pthread_join(analyze_th, NULL);
 	return 0;
 }

@@ -83,7 +83,13 @@ void buffer_start() {
 
 	for (int i = 0; i < N; i++) { /* For each allocated byte */
 		allocated_memory[i] = 0; /* Initialize the byte with 0 */
-
+		
+		if(i % 2 == 0){ // FOR TESTING DATA
+			allocated_memory[i] = 0;
+		}else{
+			allocated_memory[i] = 1;
+		}
+		
 		if (i % BLOCK_SIZE == 0) {
 			/* Example: if the block_size is equal to 10, this "if" is true when i = {0, 10, 20, ...} */
 

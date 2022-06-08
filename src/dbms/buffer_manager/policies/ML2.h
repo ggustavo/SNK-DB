@@ -1,7 +1,5 @@
 /*
- * (AM-LRU)
- * Reference Paper:
- * - A Multiple LRU List Buffer Management Algorithm (2019)
+
  */
 #ifndef POLICY_H_INCLUDED
 #define POLICY_H_INCLUDED

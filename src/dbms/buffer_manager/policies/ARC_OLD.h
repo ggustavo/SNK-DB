@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include "../db_buffer.h"
 #include "../../db_config.h"
-#include "../../util/hash_table.h"
 
 struct List * T1;
 struct List * T2;
@@ -21,9 +20,7 @@ struct List * G1; /* Ghost List G1 */
 struct List * G2; /* Ghost List G2 */
 
 double P; /*  Policy Advisor */
-
-struct Hash * arc_hash;     
-
+                                           
 struct GhostPage { /* Ghost page does not store any page data only its metadata */
     int file_id;
     long block_id;
@@ -41,7 +38,7 @@ void buffer_policy_start(){
     G1 = list_create(NULL,NULL);
     G2 = list_create(NULL,NULL);
     P = (double) BUFFER_SIZE / 2;
-    arc_hash = hash_table_create(BUFFER_SIZE);  
+    
     printf("\nBuffer Replacement Policy: %s \ninitial Advisor: %d", __FILE__, P);
     printf("\n---------------------------------------------------------------------------------------------------");
 
@@ -107,6 +104,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             /* It is possible to have a page in G1 or G2 */
             ghost_node = find_ghost_page(G1, file_id, block_id);
         
+
             if(ghost_node != NULL){ /* Ghost HIT int G1 */
             
                 P = MIN( (double) BUFFER_SIZE, P + MAX( (double) SAFE_DIVISION( G2->size, G1->size), 1.0) ); /* Adapt p = min{ buffer_size, p + max{ B2.size/B1.size, 1} } */
@@ -193,10 +191,6 @@ struct Node * replacement(int x_E_G2, struct Node * ghost_node){
     struct Page * page = NULL;
     struct GhostPage * g_page = NULL;
 
-    hash_table_free_entity(
-        hash_table_remove(arc_hash, ( (struct GhostPage *) ghost_node->content)->block_id )
-    );
-
     if(T1->size >= 1 && ( (x_E_G2 == 1 && (double) T1->size == P) || ((double) T1->size > P) )) { /* if (|T1| ≥ 1) and ((x ∈ G2 and |T1| = p) or (|T1| > p)) */
         victim = remove_LRU(T1);
         page = (struct Page * ) victim->content;
@@ -212,8 +206,6 @@ struct Node * replacement(int x_E_G2, struct Node * ghost_node){
         g_page->block_id = page->block_id;
         insert_MRU(G2, ghost_node);
     }
-
-    hash_table_put(arc_hash, g_page->block_id , ghost_node); // HASH
     return victim;
 }
 
@@ -240,32 +232,15 @@ void move_to_MRU(struct List * source, struct Node * node, struct List * target)
 
 
 struct Node * find_ghost_page(struct List * list, int file_id, int block_id){
-    /*
     struct Node * x = list->head;
         while(x != NULL){
             struct GhostPage * ghost = (struct GhostPage *) x->content;
             if(ghost->file_id == file_id && ghost->block_id == block_id){
-
                 return x;
             }
             x = x->next;
         }
     return NULL;
-    */
-    struct Entity * entity = hash_table_get(arc_hash, ( (unsigned int) block_id ));
-    if(entity == NULL){
-        return NULL;
-    }
-    if(entity->key =! block_id){
-        printf("\n[ERR0] ARC: Hash key is not the same as the block_id");
-        exit(1);
-    }
-    struct Node * x = (struct Node *) entity->value;
-    if(x->list == list){
-        return x;
-    }
-    return NULL;
-
 }
 
 void buffer_print_policy(){
