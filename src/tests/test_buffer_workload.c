@@ -43,10 +43,11 @@ void * buffer(void * arg){
         return NULL;
 	}    
 
+    int max_block_id = 0;
 
 	gettimeofday(&start_time, NULL); // Start Time
     while (fscanf(file, "%c;%d\n", &operation, &block_id) > 0) {
-       
+        if(block_id > max_block_id) max_block_id = block_id;
        
         //printf("\nRequest ---> %c[%d-%d]", operation, map_file_id(data_file_id)->file_id, block_id);		
         
@@ -63,7 +64,7 @@ void * buffer(void * arg){
     double time =  ( ((double) ((double)end_time.tv_usec - (double)start_time.tv_usec)) / 1000000 ) +  ( (double) ((double)end_time.tv_sec - (double)start_time.tv_sec) )  ;
     
     printf("\nExecution Time = %f seconds\n", time);
-
+    printf("\nMax Block ID = %d\n", max_block_id);
 
     export_json_final_result(result_file_test ,BUFFER_POLICY_NAME, BUFFER_SIZE, flush_operations, hit_operations, time);
 	//printf("\nPress Any Key to Exit\n");

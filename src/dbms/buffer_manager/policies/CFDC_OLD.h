@@ -22,8 +22,7 @@ int working_region_size;
 int priority_region_size;
 int GC; //global time
 int MAX_CLUSTER_SIZE;    
-
-struct Hash * clusters_hash;     
+ 
 
 struct Cluster{
     int id;
@@ -52,7 +51,7 @@ struct CFDCNode * CFDC_remove_from_cluster(struct CFDCNode * cfdc_node);
 void CFDC_destroy_cluster(struct Cluster * cluster);
 double CFDC_priority_function(struct Cluster * cluster);
 struct Cluster * CFDC_create_cluster(int id);
-void CFDC_insert_cluster_list_ordering(struct Cluster * x);
+
 /*
  * This function is called after initializing the buffer and before page requests.
  * 
@@ -70,7 +69,6 @@ void buffer_policy_start(){
     working_queue = list_create(NULL,NULL);
     clean_queue = list_create(NULL,NULL);
     dirty_queue = list_create(NULL,NULL);
-    clusters_hash = hash_table_create(6929239);  
 }
 
 struct Page * buffer_request_page(int file_id, long block_id, char operation){
@@ -107,8 +105,8 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             its cluster IPD including the timestamp
             */
             struct Cluster * cluster = cfdc_node->cluster;
-            
             CFDC_remove_from_cluster(cfdc_node);
+            CFDC_insert_working(cfdc_node);
 
             if(cluster->list->size == 0){
                 list_remove(dirty_queue, cluster->node);
@@ -116,11 +114,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             }else{
                 cluster->timestamp = GC;
                 cluster->priority = CFDC_priority_function(cluster);
-                list_remove(dirty_queue, cluster->node);
-                CFDC_insert_cluster_list_ordering(cluster);
             }
-
-            CFDC_insert_working(cfdc_node);
 
         }
 
@@ -193,14 +187,10 @@ void CFDC_insert_dirty(struct CFDCNode * cfdc_node){
     struct Cluster * cluster = CFDC_target_cluster(cfdc_node->page);
     
     if(cluster == NULL){
-        int id_cluster =  CFDC_cluster_id(cfdc_node->page);
-        cluster = CFDC_create_cluster( id_cluster );
-        hash_table_put(clusters_hash, id_cluster, cluster);
-        
+        cluster = CFDC_create_cluster( CFDC_cluster_id(cfdc_node->page) );
         //The cluster timestamp is the value of globaltime at the time of its creation.
         cluster->timestamp = GC;
-    }else{
-        list_remove(dirty_queue, cluster->node);
+        list_insert_node_head(dirty_queue, cluster->node);
     }
 
     /*
@@ -215,49 +205,8 @@ void CFDC_insert_dirty(struct CFDCNode * cfdc_node){
     //priority queue is adjusted.
     cfdc_node->cluster->priority = CFDC_priority_function(cluster);
     //printf("  Priority: %d", cfdc_node->cluster->priority);
-    CFDC_insert_cluster_list_ordering(cluster);
 }
 
-void CFDC_insert_cluster_list_ordering(struct Cluster * x){
-
-    if(dirty_queue->size == 0){
-        list_insert_node_head(dirty_queue, x->node);
-        return;
-    }
-
-    struct Node * node = dirty_queue->tail;
-    struct Cluster * cluster = NULL;
-
-    while(node != NULL){
-        cluster = (struct Cluster *) node->content;
-        
-        if(cluster->list->size == 0){
-
-            printf("\n[ERR0] CFDC: cluster->list->size = 0");
-            exit(1);
-        }
-        if(cluster->priority < 0){
-            printf("\n[ERR0] CFDC: cluster->priority < 0");
-            exit(1);
-        }
-
-        if(x->priority < cluster->priority){
-            list_insert_node_after(dirty_queue, cluster->node, x->node);
-            return;
-        }
-
-        if(dirty_queue->head == cluster->node){
-            list_insert_node_head(dirty_queue, x->node);
-            return;
-        }
-
-        node = node->prev;
-    }
-    if(x->node->list == NULL){
-        printf("\n[ERR0] CFDC: Insert x->node->list == NULL");
-        exit(1);
-    }
-}
 
 
 double CFDC_priority_function(struct Cluster * cluster){
@@ -312,10 +261,9 @@ struct CFDCNode * get_dirty_victim(){
     
     struct Node * node = dirty_queue->tail;
     
+    struct Cluster * cluster = NULL;
     struct Cluster * cluster_victim = NULL;
 
-    /*
-    struct Cluster * cluster = NULL;
     double min = -1;
 
     while(node != NULL){
@@ -336,9 +284,7 @@ struct CFDCNode * get_dirty_victim(){
         }
 
         node = node->prev;
-    } */
-
-    cluster_victim = (struct Cluster *) node->content; // TAIL cluster
+    }
 
     if(cluster_victim == NULL){
         printf("\n[ERR0] CFDC: cluster_victim == NULL");
@@ -398,7 +344,7 @@ struct CFDCNode * CFDC_create_node(struct Page * page){
 struct Cluster* CFDC_target_cluster(struct Page * x){
    
 	int cluster_id = CFDC_cluster_id(x);
-    /*
+
 	struct Node * n = dirty_queue->head;
     struct Cluster * cluster = NULL;
 
@@ -410,14 +356,8 @@ struct Cluster* CFDC_target_cluster(struct Page * x){
         }    
         n = n->next;
     }
-    */
-    struct Entity * entity = hash_table_get(clusters_hash, cluster_id);
-    
-    if(entity == NULL){
-        return NULL;
-    }
-    
-	return (struct Cluster*)entity->value;
+
+	return NULL;
 
 }
 
@@ -435,11 +375,7 @@ struct CFDCNode * CFDC_remove_from_cluster(struct CFDCNode * cfdc_node){
 }
 
 void CFDC_destroy_cluster(struct Cluster * cluster){
-
-    hash_table_free_entity(
-        hash_table_remove(clusters_hash, cluster->id)
-    );
-
+   
     list_free_node(cluster->list, cluster->node);
     
     if (cluster->list != NULL && cluster->list->size > 0){
@@ -448,6 +384,7 @@ void CFDC_destroy_cluster(struct Cluster * cluster){
     }
 
     list_free(cluster->list);    
+    
     free(cluster);
 }
 

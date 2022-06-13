@@ -173,7 +173,8 @@ void buffer_policy_start(){
     ghost_list = list_create(NULL,NULL);
     historic_in = (struct HistoricNodeIn **) malloc(historic_size_in * sizeof(struct HistoricNodeIn*));
     historic_list_out = list_create(NULL,NULL);
-    ghost_hash = hash_table_create(BUFFER_SIZE);
+    
+    ghost_hash = hash_table_create(6929239);
 
     for (int i = 0; i < historic_size_in; i++){
         struct HistoricNodeIn * h_node = (struct HistoricNodeIn *) malloc(sizeof(struct HistoricNodeIn));

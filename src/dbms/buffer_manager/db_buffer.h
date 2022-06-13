@@ -12,6 +12,7 @@
 #include "../db_config.h"
 #include "../file_manager/db_access_file.h"
 #include "../util/doubly_linked_list.h"
+#include "../util/hash_table.h"
 
 void buffer_print_policy();
 
@@ -53,20 +54,24 @@ struct Page{
  */
 char * allocated_memory;
 struct Page * pages;
-struct List * free_list;
+struct List * db_buffer_free_list;
+struct Hash * db_buffer_hash;    
 
 /*
  * Reset the page to its original state. Note: This does not reset the data allocated in-memory for the frame.
  */
 struct Page * buffer_reset_page(struct Page *page) {
 	if (page != NULL) {
+		hash_table_free_entity(
+        	hash_table_remove(db_buffer_hash, ( (unsigned int) page->block_id ))
+    	);
 		page->block_id = -1;
 		page->file_id = -1;
 		page->dirty_flag = PAGE_CLEAN;
 		page->status = PAGE_STATUS_UNLOCKED;
 		return page;
 	}
-	printf("\n[ERR0] CLean Page NULL");
+	printf("\n[ERR0] Reset Page NULL");
 	return NULL;
 }
 
@@ -74,9 +79,10 @@ struct Page * buffer_reset_page(struct Page *page) {
  * Initializes in-memory storage structures of the buffer manager.
  */
 void buffer_start() {
-	free_list = list_create(NULL,NULL);
+	db_buffer_free_list = list_create(NULL,NULL);
 	allocated_memory = (char*) malloc( BUFFER_SIZE * BLOCK_SIZE );
 	pages = (struct Page*) malloc(sizeof(struct Page) * BUFFER_SIZE);
+	db_buffer_hash = hash_table_create(6929239); 
 
 	/* BUFFER_SIZE * BLOCK_SIZE determines the size of the space allocated in-memory for data */
 	int N = BUFFER_SIZE * BLOCK_SIZE;
@@ -99,7 +105,7 @@ void buffer_start() {
 			page->data = &allocated_memory[i]; /* set the first pointer of this frame into the page */
 			page->extended_attributes = NULL;
 			buffer_reset_page(page);
-			list_insert_tail(free_list,page);
+			list_insert_tail(db_buffer_free_list,page);
 		}
 
 	}
@@ -119,13 +125,22 @@ void buffer_start() {
  * This function needs to be optimized for a hash table or something faster than a sequential search.
  */
 struct Page * buffer_find_page(int file_id, long block_id){
+	struct Entity * entity = hash_table_get(db_buffer_hash, ( (unsigned int) block_id ));
+    if(entity == NULL){
+        return NULL;
+    }
+	return (struct Page *) entity->value;
+	/*
+	struct Page * find = NULL;
 	for(int i = 0; i < BUFFER_SIZE; i++){
 		struct Page * page = &pages[i];
 		if(page->file_id == file_id && page->block_id == block_id){
+			find = page;
 			return page;
 		}
 	}
-	return NULL;
+	return find;
+	*/
 }
 
 /*
@@ -164,6 +179,7 @@ struct Page * buffer_load_page(int file_id, long block_id, struct Page * target)
 		file_read(file_id, block_id, target->data, BLOCK_SIZE);
 		target->file_id = file_id;
 		target->block_id = block_id;
+		hash_table_put(db_buffer_hash, ( (unsigned int) block_id ), target);
 		return target;
 	}
 	printf("\n[ERR0] Load Page %d#%ld NULL",file_id,block_id);
@@ -195,10 +211,10 @@ void buffer_computes_request_statistics(struct Page * page, char operation){
 
 
 char buffer_is_full(){
-	if(free_list->size < 0){
+	if(db_buffer_free_list->size < 0){
 		printf("\n[ERR0] Free List negative size ...");
 	}
-	if(free_list->size == 0){
+	if(db_buffer_free_list->size == 0){
 		return TRUE;
 	}
 	return FALSE;
@@ -211,15 +227,15 @@ struct Page * buffer_get_free_page(){
 		exit(1);
 		return NULL;
 	}
-	struct Node * node = list_remove_head(free_list);
+	struct Node * node = list_remove_head(db_buffer_free_list);
 	struct Page * page = (struct Page *) node->content;
-	list_free_node(free_list, node);
+	list_free_node(db_buffer_free_list, node);
 	return page;
 }
 
 void buffer_add_new_free_page(struct Page * page){
 	buffer_reset_page(page);
-	list_insert_tail(free_list,page);
+	list_insert_tail(db_buffer_free_list,page);
 }
 
 

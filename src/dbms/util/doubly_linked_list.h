@@ -82,6 +82,7 @@ void list_insert_node_tail(struct List * list, struct Node * x) {
     x->list = list;
 }
 
+
 void list_insert_tail(struct List *list, void * content) {
 	struct Node * x = list_create_node(content);
 	list_insert_node_tail(list, x);
@@ -165,6 +166,43 @@ void list_free(struct List* list){
 	 list->print_function = NULL;
 	 list->free_function = NULL;
 	 free(list);
+}
+
+
+void list_insert_node_before(struct List * list, struct Node * before, struct Node * x) {
+	x->next = NULL;
+	x->prev = NULL;
+
+	if (before == list->head) {
+		x->next = list->head;
+		list->head->prev = x;
+		list->head = x;
+	} else {
+		x->next = before;
+		x->prev = before->prev;
+		before->prev->next = x;
+		before->prev = x;
+	}
+	list->size++;
+    x->list = list;
+}
+
+void list_insert_node_after(struct List * list, struct Node * after, struct Node * x) {
+	x->next = NULL;
+	x->prev = NULL;
+
+	if (after == list->tail) {
+		x->prev = list->tail;
+		list->tail->next = x;
+		list->tail = x;
+	} else {
+		x->next = after->next;
+		x->prev = after;
+		after->next->prev = x;
+		after->next = x;
+	}
+	list->size++;
+	x->list = list;
 }
 
 #endif

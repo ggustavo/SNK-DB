@@ -41,7 +41,7 @@ void buffer_policy_start(){
     G1 = list_create(NULL,NULL);
     G2 = list_create(NULL,NULL);
     P = (double) BUFFER_SIZE / 2;
-    arc_hash = hash_table_create(BUFFER_SIZE);  
+    arc_hash = hash_table_create(6929239);  
     printf("\nBuffer Replacement Policy: %s \ninitial Advisor: %d", __FILE__, P);
     printf("\n---------------------------------------------------------------------------------------------------");
 
@@ -252,19 +252,32 @@ struct Node * find_ghost_page(struct List * list, int file_id, int block_id){
         }
     return NULL;
     */
+
+
     struct Entity * entity = hash_table_get(arc_hash, ( (unsigned int) block_id ));
     if(entity == NULL){
         return NULL;
     }
+
     if(entity->key =! block_id){
         printf("\n[ERR0] ARC: Hash key is not the same as the block_id");
         exit(1);
     }
+
     struct Node * x = (struct Node *) entity->value;
+    
+    if(x->list == NULL){
+        if(x->list != G1 || x->list != G2){
+            printf("\n[ERR0] ARC: Ghost page is not in the G1 or G2");
+            exit(1);
+        }
+    }
+    
     if(x->list == list){
         return x;
     }
     return NULL;
+
 
 }
 
