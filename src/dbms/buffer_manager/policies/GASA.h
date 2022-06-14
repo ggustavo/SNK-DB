@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include "../db_buffer.h"
 #include "../../db_config.h"
-
+#include "../../util/hash_table.h"
 
 struct List * cold_clean_list;
 struct List * mixed_list;
@@ -22,6 +22,8 @@ struct List * ghost_list;
 int GSMIN;
 int GSMAX;
 int GS; //Ghost List adivisor
+
+struct Hash * gasa_hash;     
 
 struct GASANode{
     struct Page * page;
@@ -53,7 +55,7 @@ void buffer_policy_start(){
     GS = GSMAX / 2;
     printf("\nBuffer Replacement Policy: %s \nGSMIN: %d GSMAX: %d", __FILE__, GSMIN, GSMAX);
     printf("\n---------------------------------------------------------------------------------------------------");
-	
+	gasa_hash = hash_table_create(6929239);  
     cold_clean_list = list_create(NULL,NULL);
     mixed_list = list_create(NULL,NULL);
     ghost_list = list_create(NULL,NULL);
@@ -126,7 +128,9 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
                 node_victim->ghost_bit = 1;
                 node_victim->hot_flag = 1;
                 list_remove(ghost->node->list, ghost->node);
-
+                hash_table_free_entity(
+                    hash_table_remove(gasa_hash, ghost->g_block_id )
+                );
             }else{
                 node_victim->ghost_bit = 0;
                 node_victim->hot_flag = 0;
@@ -138,6 +142,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
             ghost->g_dirty_flag = victim->dirty_flag;
             ghost->ghost_bit = 1;
             list_insert_node_head(ghost_list, ghost->node);
+            hash_table_put(gasa_hash,  ghost->g_block_id , ghost);
 
             buffer_flush_page(victim); /* Flush the data to the secondary storage media if is dirty */
 			page = buffer_reset_page(victim); /* To avoid malloc a new page we reuse the victim page */
@@ -173,6 +178,9 @@ void GASA_ajust_GL(){
         list_free_node(ghost_list, node);
         ghost_node->node = NULL;
         ghost_node->page = NULL;
+        hash_table_free_entity(
+            hash_table_remove(gasa_hash, ghost_node->g_block_id )
+        );
         free(ghost_node);
         GASA_ajust_GL();
     }
@@ -212,6 +220,7 @@ struct GASANode * get_victim(){
 }
 
 struct GASANode * find_ghost(int file_id, int block_id){
+    /*
     struct Node * x = ghost_list->head;
         while(x != NULL){
             struct GASANode * ghost = (struct GASANode *) x->content;
@@ -225,7 +234,14 @@ struct GASANode * find_ghost(int file_id, int block_id){
             }
             x = x->next;
         }
-    return NULL;
+    */
+    struct Entity * entity = hash_table_get(gasa_hash, block_id);
+    
+    if(entity == NULL){
+        return NULL;
+    }
+    
+	return (struct GASANode *)entity->value;
 }
 
 
