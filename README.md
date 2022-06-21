@@ -66,4 +66,5 @@ gcc src/tests/test_buffer_requests.c -o database -Wall -Wextra
 > **Note:** Use [db_kernel.h](https://github.com/ggustavo/SNK-DB/blob/master/src/dbms/db_kernel.h). If you don't want to use these options
 
 > \* ***in test phase***
+> 
 > [Project Activities](https://github.com/ggustavo/SNK-DB/projects/1?fullscreen=true)
