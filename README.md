@@ -3,7 +3,6 @@
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/ggustavo/SNK-DB)  [![Run on Repl.it](https://repl.it/badge/github/replit/crosis)](https://repl.it/github/ggustavo/SNK-DB)
 
 A simple file engine to study techniques to develop database management systems.
-[Project Activities](https://github.com/ggustavo/SNK-DB/projects/1?fullscreen=true)
 
 
 ####  Download
@@ -67,3 +66,5 @@ gcc src/tests/test_buffer_requests.c -o database -Wall -Wextra
 > **Note:** Use [db_kernel.h](https://github.com/ggustavo/SNK-DB/blob/master/src/dbms/db_kernel.h). If you don't want to use these options
 
 > \* ***in test phase***
+> 
+> [Project Activities](https://github.com/ggustavo/SNK-DB/projects/1?fullscreen=true)
