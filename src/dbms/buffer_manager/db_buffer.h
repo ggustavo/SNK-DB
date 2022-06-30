@@ -81,6 +81,7 @@ struct Page * buffer_reset_page(struct Page *page) {
 void buffer_start() {
 	db_buffer_free_list = list_create(NULL,NULL);
 	allocated_memory = (char*) malloc( BUFFER_SIZE * BLOCK_SIZE );
+	//--------> FOR TEST allocated_memory = (char*) memalign( BLOCK_SIZE, BUFFER_SIZE * BLOCK_SIZE );
 	pages = (struct Page*) malloc(sizeof(struct Page) * BUFFER_SIZE);
 	db_buffer_hash = hash_table_create(6929239); 
 

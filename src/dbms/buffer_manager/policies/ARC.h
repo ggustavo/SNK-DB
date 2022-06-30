@@ -42,7 +42,7 @@ void buffer_policy_start(){
     G2 = list_create(NULL,NULL);
     P = (double) BUFFER_SIZE / 2;
     arc_hash = hash_table_create(6929239);  
-    printf("\nBuffer Replacement Policy: %s \ninitial Advisor: %d", __FILE__, P);
+    printf("\nBuffer Replacement Policy: %s \ninitial Advisor: %f", __FILE__, P);
     printf("\n---------------------------------------------------------------------------------------------------");
 
 }

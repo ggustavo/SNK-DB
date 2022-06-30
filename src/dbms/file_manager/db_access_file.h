@@ -15,6 +15,7 @@
 
 int file_open(char * path) {
 	int file = open(path,  O_RDWR | O_CREAT, 0777); // O_CREAT | O_RDWR
+	//--------> FOR TEST int file = open(path,  O_RDWR | O_CREAT | O_DIRECT, 0777); // O_CREAT | O_RDWR
 	if (file == -1) {
 		perror(path);
 	}

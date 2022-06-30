@@ -76,21 +76,21 @@ int ANALYZE_THREAD_FLAG = 1;
 
 void * analyze_thread(void * arg){
     int iternal = 0;
+    #ifdef ML3
     while (ANALYZE_THREAD_FLAG == 1) {
         //printf("\nAnalyze Thread ...");
-         #ifdef ML3
             //if(GC > iternal + 50){
                 analyze(NULL); 
                 //iternal = GC; 
            // }
-        #endif
         //sleep(0.0001);
     }
+    #endif
     return NULL;
 }
 
 int main(int argc, char *argv[]) {
-
+    
     if (argc <= 1 ){
         printf("[ERR0] Missing parameters\n");
         return 1;
