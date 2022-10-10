@@ -14,4 +14,15 @@ void export_json_final_result(char * worload, char *policy_name, int buffer_size
 
 }
 
+void export_csv_current_state(FILE *f, char *policy_name, int write, int hits, char operation, int id, int r){
+    
+    /*fprintf(f,"{\"operation\":%c,\"id\":%d,\"name_p\":\"%s\",\"buffer_size\":%d,\"hits\":%d,\"writes\":%d},\n",
+            operation,id,policy_name,buffer_size,hits,write);
+    */
+
+     fprintf(f,"%d,%s,%d,%c,%d,%d \n",
+            r,policy_name,id,operation,hits,write);
+    
+}
+
 #endif

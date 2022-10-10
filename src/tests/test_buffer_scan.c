@@ -30,6 +30,7 @@ struct DataFile * map_file_id(int file_id){
 
 char * workload_test;
 char * result_file_test;
+char * result_file_test_scan;
 
 void * buffer(void * arg){
     struct timeval start_time, end_time;
@@ -45,8 +46,15 @@ void * buffer(void * arg){
 
     int max_block_id = 0;
 
+    FILE * scans_results;
+    scans_results = fopen(result_file_test_scan,"at");
+    fprintf(scans_results,"%s","\n");
+    
+    int cc_ = 0;
+
 	gettimeofday(&start_time, NULL); // Start Time
     while (fscanf(file, "%c;%d\n", &operation, &block_id) > 0) {
+        cc_ ++;
         if(block_id > max_block_id) max_block_id = block_id;
        
         //printf("\nRequest ---> %c[%d-%d]", operation, map_file_id(data_file_id)->file_id, block_id);		
@@ -54,8 +62,12 @@ void * buffer(void * arg){
         if(operation == 'R')buffer_request_page( map_file_id(data_file_id)->file_id, block_id, READ_REQUEST);
         if(operation == 'W')buffer_request_page( map_file_id(data_file_id)->file_id, block_id, WRITE_REQUEST);
         //buffer_print_policy();
+
+        export_csv_current_state(scans_results, BUFFER_POLICY_NAME,  flush_operations, hit_operations, operation, block_id, cc_);
+    
     }  
 
+    
     gettimeofday(&end_time, NULL); // End Time
 
     //buffer_flush(); 
@@ -67,7 +79,10 @@ void * buffer(void * arg){
     printf("\nMax Block ID = %d\n", max_block_id);
 
     export_json_final_result(result_file_test ,BUFFER_POLICY_NAME, BUFFER_SIZE, flush_operations, hit_operations, time);
-	//printf("\nPress Any Key to Exit\n");
+	
+    fprintf(scans_results,"%s","\n");
+    fclose(scans_results);
+    //printf("\nPress Any Key to Exit\n");
 	//getchar();
     return NULL;
 }
@@ -125,6 +140,12 @@ int main(int argc, char *argv[]) {
     printf("\n---------------------------------------------------------------\n");
     workload_test = argv[2];
     result_file_test = result_file;
+
+
+    char str[20];
+    sprintf(str, "scan_%d.csv", BUFFER_SIZE);
+
+    result_file_test_scan = str;
 
     pthread_t workload_th;
     pthread_t analyze_th;
