@@ -127,6 +127,10 @@
 	#include "buffer_manager/policies/ML4.h"
 	#define BUFFER_POLICY_NAME  "ML4"	
 
+#elif ST
+	#include "buffer_manager/policies/ST.h"
+	#define BUFFER_POLICY_NAME  "ST"
+
 #else /* If no policy has been chosen. Use LRU as default */
 	#include "buffer_manager/policies/LRU.h"
 	#define BUFFER_POLICY_NAME  "LRU"
