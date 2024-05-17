@@ -17,7 +17,7 @@
 // --------------------------------------------------------------------------------------------
 
 #ifndef BLOCK_SIZE
-	#define BLOCK_SIZE  100  /* Sets the size of the block accessed on the secondary storage media */
+	#define BLOCK_SIZE 100   /* Sets the size of the block accessed on the secondary storage media 4096 */
 #endif
 
 #ifndef BUFFER_SIZE
@@ -97,7 +97,7 @@ char CATALOG_SCHEMAS_FOLDER[] = "data/schemas";
 	#include <io.h>       /* to use mkdir? windows? */
 	#define xmkdir(path) mkdir(path); /* <----- windows? */
 #else
-	#define xmkdir(path) mkdir(path, 0777); /* -DWIN to compile on Windows (warning: is not stable) */
+	#define xmkdir(path) mkdir(path, 0777); /* use -DWIN to compile on Windows (warning: is not stable) */
 #endif
 
 

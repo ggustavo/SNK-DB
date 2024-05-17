@@ -151,6 +151,22 @@ struct Entity * hash_table_remove(struct Hash * hash, unsigned int key){
     return NULL;
 } 
 
+void hash_table_free(struct Hash * hash){
+    for (int i = 0; i < hash->number_of_buckets; i++) {
+        struct List * bucket = hash->buckets[i];
+        if(bucket!=NULL){
+            if (bucket->size > 0){
+                printf("\n[WARN] hash_table_free: bucket[%d] is not empty", i);
+            }
+            list_free(bucket);
+        }
+        hash->buckets[i] = NULL;
+    }
+    free(hash->buckets);
+    free(hash);
+}
+
+
 /*
 * Converts all entities in the hash to a struct List.
 * Return NULL if there is no entities.

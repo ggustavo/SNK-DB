@@ -1,11 +1,12 @@
+#include "../dbms/db_kernel.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
-#include "../dbms/db_kernel.h"
 #include "../dbms/file_manager/data_file.h"
 #include "../dbms/db_export_json.h"
 #include <pthread.h>
 #include <unistd.h>
+
 
 struct DataFile * warehouse;
 struct DataFile * district;
@@ -27,6 +28,8 @@ struct DataFile * map_file_id(int file_id){
        if(file_id == 88) return stock;
        return NULL;
 }
+
+
 
 char * workload_test;
 char * result_file_test;
@@ -101,7 +104,8 @@ void * analyze_thread(void * arg){
 }
 
 int main(int argc, char *argv[]) {
-    
+
+
     if (argc <= 1 ){
         printf("[ERR0] Missing parameters\n");
         return 1;
@@ -132,8 +136,14 @@ int main(int argc, char *argv[]) {
     pthread_create(&workload_th, NULL, buffer, NULL);
     pthread_create(&analyze_th, NULL, analyze_thread, NULL);
 
+
     pthread_join(workload_th, NULL);
     ANALYZE_THREAD_FLAG = 0;
     pthread_join(analyze_th, NULL);
+
+    //printf("\nMax Entropy = %f", MAX_Entropy);
+    //printf("\nMIn Entropy = %f\n", MIN_Entropy);
+
+
 	return 0;
 }

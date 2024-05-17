@@ -7,8 +7,11 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/time.h>
 #include "db_config.h"
 #include "file_manager/catalog.h"
+
+
 
 /*
 * These conditional macros choose the Page Replacement Policy
@@ -135,7 +138,6 @@
 	#include "buffer_manager/policies/LRU.h"
 	#define BUFFER_POLICY_NAME  "LRU"
 #endif
-
 
 void start_database(){
 	catalog_start();

@@ -9,6 +9,7 @@
 #include "../db_buffer.h"
 #include "../../db_config.h"
 #include "../../util/hash_table.h"
+#include <math.h>
 
 
 /*
@@ -21,10 +22,7 @@
 *                         struct Page * page                                 void * content
 */
 
-int count_evicted_cold_clean = 0;
-int count_evicted_cold_dirty = 0;
-int count_evicted_hot_clean = 0;
-int count_evicted_hot_dirty = 0;
+
 
 struct List * hot_clean;
 struct List * hot_dirty;
@@ -58,20 +56,22 @@ double read_ghost_hit_intensity = 0;
 double write_miss_intensity = 0;
 double read_miss_intensity = 0;
 
-double max_page_frequency_interval = 0;
 
 int desirable_cold_clean_size;
 int desirable_cold_dirty_size;
 int desirable_hot_clean_size;
 int desirable_hot_dirty_size;
 
-double score_cold_clean;
-double score_cold_dirty;
-double score_hot_clean;
-double score_hot_dirty;
 
 double write_cost;
 double read_cost;
+
+
+double MAX_Entropy = 0.0;
+double MIN_Entropy = 1.0;
+
+double ENTROPY = 0.0;
+
 
 struct MLNode{
     struct Page * page;
@@ -79,8 +79,6 @@ struct MLNode{
     double references; // Frequency
     int first; // First access time
     int last; // Last access time
-    double ES; // Forecast
-    double ERROR;
 };
 
 struct HistoricNodeIn{
@@ -103,8 +101,6 @@ struct HistoricNodeOut{
     double references; // Frequency
     int first; // First access time
     int last; // Last access time
-    double ES; // Forecast
-    double ERROR;
     int ghost_GC; // time the page entered the ghost list
     struct Node * node;
 };
@@ -118,7 +114,6 @@ struct MLNode * get_MLNode(struct Node * node);
 double NEW_PC(struct MLNode * lru_node);
 struct MLNode * get_victim();
 void NEW_print_PC(struct Node * x);
-void ES();
 void add_historic_in(struct Page * page, double references, int is_hit, int is_miss, int is_ghost_hit);
 void add_historic_out(struct MLNode * ml_node, struct HistoricNodeOut * ghost);
 
@@ -133,6 +128,13 @@ struct HistoricNodeOut * find_ghost(int file_id, long block_id);
 
 struct HistoricNodeOut * aux = NULL;
 
+double log_2(double x);
+double calc_entropy();
+
+double log_2(double x) { 
+    return log(x) * M_LOG2E; 
+}
+ 
 
 /*
  * This function is called after initializing the buffer and before page requests.
@@ -158,11 +160,6 @@ void buffer_policy_start(){
 
     write_cost = 0.8;
     read_cost = 0.2;
-
-    score_cold_clean = 50.0;
-    score_cold_dirty = 50.0;
-    score_hot_clean = 50.0;
-    score_hot_dirty = 50.0;
 
     printf("\nBuffer Replacement Policy: %s \nALFA:%f Historic Size:%d", __FILE__, ALFA, historic_size_in);
     printf("\n---------------------------------------------------------------------------------------------------");
@@ -214,21 +211,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
 
 		struct MLNode * ml_node = (struct MLNode *) page->extended_attributes;
         ml_node->references =  ml_node->references  + 1;
-        ES(ml_node);
         ml_node->last = GC;
-
-        if (ml_node->node->list == cold_clean){
-            score_cold_clean = reward(score_cold_clean + 1 + read_cost);
-        }
-        else if (ml_node->node->list == cold_dirty){
-            score_cold_dirty = reward(score_cold_dirty + 1 + write_cost);
-        }
-        else if (ml_node->node->list == hot_clean){
-            score_hot_clean = reward(score_hot_clean + 1 + read_cost);
-        }
-        else if (ml_node->node->list == hot_dirty){
-            score_hot_dirty = reward(score_hot_dirty + 1 + write_cost);
-        }
 
         list_remove(ml_node->node->list,ml_node->node); // Removes the node from the current list
 
@@ -271,8 +254,7 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
                 aux->references = ghost->references;
                 aux->first = ghost->first;
                 aux->last = ghost->last;
-                aux->ES = ghost->ES;
-                aux->ERROR = ghost->ERROR;
+
                 aux->ghost_GC = ghost->ghost_GC;
             }
 
@@ -317,27 +299,12 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
                 );
                 */
 
-                if(aux->references > 1){
-                    //printf("\nFREQUENT PAGE");
-                    if(aux->dirty_flag == PAGE_CLEAN){
-                        score_hot_clean = punish(score_hot_clean - (1 + read_cost) );
-                    }else{
-                        score_hot_dirty = punish(score_hot_dirty - (1 + write_cost) );
-                    }
-                }else{
-                  
-                    if(aux->dirty_flag == PAGE_CLEAN){
-                        score_cold_clean = punish(score_cold_clean - (1 + read_cost) );
-                    }else{
-                        score_cold_dirty = punish(score_cold_dirty - (1 + write_cost) );
-                    }
-                }	
+                
                 
                 node_victim->references = aux->references + 1;
                 node_victim->first = aux->first;
-                node_victim->ES = aux->ES;
-                node_victim->ERROR = aux->ERROR; 
-                ES(node_victim);
+               
+               
                 node_victim->last = GC;
                 
                 if (operation == READ_REQUEST){
@@ -350,15 +317,14 @@ struct Page * buffer_request_page(int file_id, long block_id, char operation){
                 node_victim->references = 1.0;
                 node_victim->last = GC;
                 node_victim->first = GC;
-                node_victim->ES = 0;
-                node_victim->ERROR = 0;   
+                
 
                 if (operation == READ_REQUEST){
                     NEW_insert(cold_clean, node_victim);
-                    score_cold_clean = punish(score_cold_clean - 1 - read_cost);
+                    
                 }else{
                     NEW_insert(cold_dirty, node_victim);
-                    score_cold_dirty = punish(score_cold_dirty - 1 - write_cost);
+                    
                 } 
             }
 
@@ -380,26 +346,6 @@ struct MLNode * get_MLNode(struct Node * node){
 
 
 
-
-// Exponential smoothing
-// E(t) = E(t-1) + alfa * ( d(t) - E(t-1) )
-void ES(struct MLNode * node){
-    // (GC - node->last) is the distance between the last time the page was used and now
-    double distance = (double) (GC - node->last);
-    if (node->ES == 0){ // second reference now
-        node->ES = distance;
-        node->ERROR = 0;
-    }else{
-        node->ERROR = ABS( (distance - node->ES) );
-    }
-    
-    node->ES = node->ES + ALFA * ( distance - node->ES);
-    
-    //if(node->page->block_id == 1){
-    //    printf("\n OP: %d // D: %f ES: %f ERROR:%f", operations, distance, node->ES, node->ERROR);
-    //}
-}
-
 double calc_score(struct MLNode * node){
     if(node == NULL){
         printf("\n[ERR0] node is NULL");
@@ -407,37 +353,55 @@ double calc_score(struct MLNode * node){
     }
 
     //FATORES A CONSIDERAR:
-    // ES
-    // ERROR
     // REFERENCES
     // TEMPO EM BUFFER
     // CUSTO DA OPERACAO
     // INTENSIDADE DA OPERACAO
 
-    
-    double result = 0.0;
-    
-    //double error_calc =  SAFE_DIVISION(node->references, node->ERROR);
-    //ouble ES_calc = SAFE_DIVISION(node->references, node->ES);
-    //double error_calc =  SAFE_DIVISION(node->ERROR, node->references);
-    //double ES_calc = SAFE_DIVISION(node->ES,node->references);
+    double no_access_time = (double)(GC - node->last);
+    double list_size = (double)(node->node->list->size);
 
-    result = SAFE_DIVISION( (node->ES + node->ERROR) , (node->references) );
+    // printf("no_acess_time: %d list_size: %d references: %f\n", no_acess_time, list_size, node->references);
+
+    double result = no_access_time / node->references;
+
     
-    
+
     if(node->page->dirty_flag == PAGE_DIRTY){
         //result = result - (write_intensity + write_hit_intensity + (write_ghost_hit_intensity * write_ghost_hit_intensity));
         //result = result + write_miss_intensity;
         //result = result - (result * write_cost);
-        result = (result * write_intensity) + (1 - write_cost); // COLOQUEI UM + 
+        //result = (result * write_intensity) + (1 - write_cost); // COLOQUEI UM + antigo
+        
+        //result = result + (result * write_intensity) + (result * write_cost);
+        //result = SAFE_DIVISION((write_intensity * write_cost), result);
+
+        // result = SAFE_DIVISION( ( (result * write_intensity) + (result * (1 - write_cost) ) ), result );
+
+       //  result = (result * write_intensity) + (1 - write_cost);
+        
+        result = result * ( (1 - write_intensity) + (1 - write_cost) );
+
+        
     }else{
         //result = result - (read_intensity + read_hit_intensity + (read_ghost_hit_intensity * read_ghost_hit_intensity));
-       // result = result + read_miss_intensity;
-       // result = result - (result * read_cost);
-        result = (result * read_intensity) + (1 - read_cost); // COLOQUEI UM + 
+        // result = result + read_miss_intensity;
+        // result = result - (result * read_cost);
+        //result = (result * read_intensity) + (1 - read_cost); // COLOQUEI UM + antigo
+        
+        //result = result + (result * read_intensity) + (result * read_cost);
+        //result = SAFE_DIVISION((read_intensity * read_cost), result);
+
+        //result = SAFE_DIVISION( ( (result * read_intensity) + (result * (1 - read_cost) ) ), result );
+
+        //r result = (result * read_intensity) + (1 - read_cost);
+
+         result = result * ( (1 - read_intensity) + (1 - read_cost) ) ;
+        
+        
     }
     
-    result = 0;
+    // result = 0;
     return result;
 }
 
@@ -448,11 +412,10 @@ struct MLNode * get_victim(){
     struct MLNode * P_HC = get_MLNode(hot_clean->tail);
     struct MLNode * P_HD = get_MLNode(hot_dirty->tail);
 
-    desirable_cold_clean_size = min_cold_clean_size * read_intensity;
-    desirable_cold_dirty_size = min_cold_dirty_size * write_intensity;
-    desirable_hot_clean_size = min_hot_clean_size * read_intensity;
-    desirable_hot_dirty_size = min_hot_dirty_size * write_intensity;
-
+    desirable_cold_clean_size = min_cold_clean_size * read_intensity; 
+    desirable_cold_dirty_size = min_cold_dirty_size * write_intensity; 
+    desirable_hot_clean_size = min_hot_clean_size * read_intensity; //* ENTROPY;
+    desirable_hot_dirty_size = min_hot_dirty_size * write_intensity; //* ENTROPY;
 
     // Normalize all the values
     struct MLNode * nodes[4] = {P_CC, P_CD, P_HC, P_HD};
@@ -472,8 +435,8 @@ struct MLNode * get_victim(){
     if(hot_dirty->size <= desirable_hot_dirty_size ){
         nodes[3] = NULL;
     }
-    
-    
+
+
     if(read_miss_intensity > 0 
     && (cold_clean->size > (BUFFER_SIZE  * (read_miss_intensity * read_cost) ) ) ){
         nodes[0] = P_CC;
@@ -539,23 +502,151 @@ struct MLNode * get_victim(){
         exit(1);
     }
 
-    if(victim->node->list == cold_clean){
-        count_evicted_cold_clean++;
-    }
-    if(victim->node->list == cold_dirty){
-        count_evicted_cold_dirty++;
-    }
-    if(victim->node->list == hot_clean){
-        count_evicted_hot_clean++;
-    }
-    if(victim->node->list == hot_dirty){
-        count_evicted_hot_dirty++;
-    }
-
     return victim;
 }
 
 
+struct Entropy_entity{
+    int block_id;
+    int count;
+};
+
+
+
+// Shannon-Wiener entropy
+double calc_entropy(){
+
+    struct Entropy_entity ** hash_entropy = malloc(6929239 * sizeof(struct Entropy_entity *));
+    int unique_hash_size = 0;
+    struct List * list_entropy = list_create(NULL, NULL);
+
+    if (hash_entropy == NULL) {
+        fprintf(stderr, "\nERROR: Memory allocation failed in calc_entropy\n");
+        exit(1);
+    }
+
+    for (int i = 0; i < historic_size_in; i++){
+        struct HistoricNodeIn * n = historic_in[i];
+        if (n->file_id == -1) {
+            
+            while(list_entropy->size > 0){
+
+                struct Node * x = list_remove_tail(list_entropy);
+
+                if(x == NULL){
+                    printf("\nERROR: 2calc_entropy x == NULL\n");
+                    exit(1);
+                }
+
+                struct Entropy_entity * ee = (struct Entropy_entity *) x->content;
+
+                if(x->content == NULL){
+                    printf("\nERROR: 2calc_entropy x->content == NULL\n");
+                    exit(1);
+                }
+
+                struct Entropy_entity * ee2 = (struct Entropy_entity *) hash_entropy[ee->block_id];
+
+                if ( ee != ee2 ){
+                    printf("\nblock_id: %d", ee->block_id);
+                    printf("\nblock_id: %d", ee2->block_id);
+                    printf("\nERROR: 2calc_entropy entity != entity \n");
+                    exit(1);
+                }
+
+                hash_entropy[ee->block_id] == NULL;
+                list_free_node(list_entropy, x);
+                free(ee);
+            }
+
+            list_free(list_entropy);
+            free(hash_entropy);
+            return 1;
+        }
+
+        int block_id = (int) n->block_id;
+
+        if (hash_entropy[block_id] == NULL){
+            struct Entropy_entity * e = (struct Entropy_entity *) malloc(sizeof(struct Entropy_entity));
+            e->block_id = block_id;
+            e->count = 1;
+
+            hash_entropy[block_id] = e;
+            list_insert_tail(list_entropy, e);
+
+            unique_hash_size ++;
+        }else{
+            struct Entropy_entity * e = (struct Entropy_entity *) hash_entropy[block_id];
+            e->count = e->count + 1;
+        }
+
+    }
+
+    double entropy = 0.0;
+    // calculate the entropy
+    struct Node * x = list_entropy->head;
+    while(x != NULL){
+
+        struct Entropy_entity * e = (struct Entropy_entity *)  x->content;
+       // printf("\nK: %d V: %d", e->block_id, e->count);
+
+        // e->count = MAX(1, e->block_id / 100000);
+
+        double p = (double) e->count / (double) historic_size_in;
+
+        //printf("\nBlock: %d\t Count: %d\t P: %f log: %f", e->block_id, e->count, p, log(p));
+
+
+        if (p != 0.0) { // Avoid log(0)
+            entropy = entropy +  (p * log(p)); // (p * log(p)); (p * log_2(p));
+        }
+
+        x = x->next;
+    }
+
+    entropy = -entropy;
+    entropy = entropy / log(unique_hash_size);
+    // entropy = (double)  unique_hash_size  /  (double)  historic_size_in;
+
+    //printf("\nUNIQUE_HASH_SIZE: %d", unique_hash_size);
+    //printf("\nhistoric_size_in: %d", historic_size_in);
+   // printf("\nENTROPY: %f", entropy);
+
+    while(list_entropy->size > 0){
+
+        struct Node * x = list_remove_tail(list_entropy);
+
+        if(x == NULL){
+            printf("\nERROR: calc_entropy x == NULL\n");
+            exit(1);
+        }
+
+        struct Entropy_entity * ee = (struct Entropy_entity *) x->content;
+
+        if(x->content == NULL){
+            printf("\nERROR: calc_entropy x->content == NULL\n");
+            exit(1);
+        }
+
+        struct Entropy_entity * ee2 = (struct Entropy_entity *) hash_entropy[ee->block_id];
+
+        if ( ee != ee2 ){
+            printf("\nblock_id: %d", ee->block_id);
+            printf("\nblock_id: %d", ee2->block_id);
+            printf("\nERROR: calc_entropy entity != entity \n");
+            exit(1);
+        }
+
+        hash_entropy[ee->block_id] == NULL;
+        list_free_node(list_entropy, x);
+        free(ee);
+    }
+
+    list_free(list_entropy);
+    free(hash_entropy);
+
+    return entropy;
+}
 
 
 
@@ -574,7 +665,6 @@ void * analyze(void * arg){
     int write_count_miss = 0;
     int write_count_ghost_hit = 0;
 
-    max_page_frequency_interval = 0;
 
     for (int i = 0; i < historic_size_in; i++){
         struct HistoricNodeIn * n = historic_in[i];
@@ -596,10 +686,7 @@ void * analyze(void * arg){
             if(n->is_ghost_hit== 1) read_count_ghost_hit++;
         }
 
-        if(n->references > max_page_frequency_interval){
-            max_page_frequency_interval = n->references;
-        }
-        
+
       
         count++;
     }
@@ -619,8 +706,40 @@ void * analyze(void * arg){
     read_hit_intensity = ( (read_count_hit * 100.0 ) / (double) count) / 100.0;
     
     //printf("\n W:%f R:%f", write_intensity, read_intensity);
+
+
+    //ENTROPY = calc_entropy();
+
+    if (ENTROPY > MAX_Entropy) MAX_Entropy = ENTROPY;
+    if (ENTROPY < MIN_Entropy) MIN_Entropy = ENTROPY;
+
+    //printf("\nENTROPY: %f", ENTROPY);
+
+
+    /**
+     * This code block prints various intensity values related to read and write operations.
+     * It displays the write intensity, read intensity, write ghost hit intensity, read ghost hit intensity,
+     * write miss intensity, read miss intensity, write hit intensity, and read hit intensity.
+    
+    system("clear");
+    printf("Write Intensity: %f\n", write_intensity);
+    printf("Read Intensity: %f\n", read_intensity);
+
+    printf("Write Ghost Hit Intensity: %f\n", write_ghost_hit_intensity);
+    printf("Read Ghost Hit Intensity: %f\n", read_ghost_hit_intensity);
+
+    printf("Write Miss Intensity: %f\n", write_miss_intensity);
+    printf("Read Miss Intensity: %f\n", read_miss_intensity);
+
+    printf("Write Hit Intensity: %f\n", write_hit_intensity);
+    printf("Read Hit Intensity: %f\n", read_hit_intensity);
+     */
+
+
     return NULL;
 }
+
+
 
 int postion_IN = 0;
 
@@ -663,8 +782,7 @@ void add_historic_out(struct MLNode * ml_node, struct HistoricNodeOut * ghost){
     h_node->references = ml_node->references;
     h_node->first = ml_node->first;
     h_node->last = ml_node->last;
-    h_node->ES = ml_node->ES;
-    h_node->ERROR = ml_node->ERROR;
+    
     h_node->ghost_GC = GC;
 
     // ml_node->first 
@@ -696,8 +814,7 @@ struct MLNode * NEW_create_node(struct Page * page){
     ml_node->page = page;   
     ml_node->last = GC;
     ml_node->first = GC;
-    ml_node->ES = 0;
-    ml_node->ERROR = 0;
+    
 
     page->extended_attributes = ml_node;
     return ml_node;
