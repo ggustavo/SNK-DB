@@ -52,16 +52,35 @@ void * buffer(void * arg){
     
     int cc_ = 0;
 
+    int scan_impact = 0;
+
 	gettimeofday(&start_time, NULL); // Start Time
     while (fscanf(file, "%c;%d\n", &operation, &block_id) > 0) {
         cc_ ++;
         if(block_id > max_block_id) max_block_id = block_id;
-       
+        
+        if(block_id >= 10000000 && block_id <= (10000000 + BUFFER_SIZE - 1) ){
+            operation = 'W';
+            // if (block_id % 2 == 0) operation = 'W';
+        }
+
         //printf("\nRequest ---> %c[%d-%d]", operation, map_file_id(data_file_id)->file_id, block_id);		
         
         if(operation == 'R')buffer_request_page( map_file_id(data_file_id)->file_id, block_id, READ_REQUEST);
         if(operation == 'W')buffer_request_page( map_file_id(data_file_id)->file_id, block_id, WRITE_REQUEST);
         //buffer_print_policy();
+        
+        if (block_id == 10000000 + BUFFER_SIZE - 1){
+            
+            printf("\nAnalysing scan impact ...\n");
+
+	        for(int i = 0; i < BUFFER_SIZE; i++){
+		        struct Page * page = &pages[i];
+                if(page->block_id >= 10000000 && page->block_id <= (10000000 + BUFFER_SIZE - 1) ){
+                    scan_impact++;
+                }
+	        }
+        }
 
         export_csv_current_state(scans_results, BUFFER_POLICY_NAME,  flush_operations, hit_operations, operation, block_id, cc_);
     
@@ -78,7 +97,8 @@ void * buffer(void * arg){
     printf("\nExecution Time = %f seconds\n", time);
     printf("\nMax Block ID = %d\n", max_block_id);
 
-    export_json_final_result(result_file_test ,BUFFER_POLICY_NAME, BUFFER_SIZE, flush_operations, hit_operations, time);
+
+    export_json_final_result_with_scan_impact(result_file_test ,BUFFER_POLICY_NAME, BUFFER_SIZE, flush_operations, hit_operations, time, scan_impact);
 	
     fprintf(scans_results,"%s","\n");
     fclose(scans_results);

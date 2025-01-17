@@ -14,6 +14,16 @@ void export_json_final_result(char * worload, char *policy_name, int buffer_size
 
 }
 
+void export_json_final_result_with_scan_impact(char * worload, char *policy_name, int buffer_size, int write, int hits, double time, int scan_impact ){
+   
+    FILE *f;
+    f = fopen(worload,"at");
+    fprintf(f,"{\"name_p\":\"%s\",\"buffer_size\":%d,\"hits\":%d,\"writes\":%d,\"time\":%f,\"scan_impact\":%d},\n",
+        policy_name,buffer_size,hits,write,time,scan_impact);
+    fclose(f);
+
+}
+
 void export_csv_current_state(FILE *f, char *policy_name, int write, int hits, char operation, int id, int r){
     
     /*fprintf(f,"{\"operation\":%c,\"id\":%d,\"name_p\":\"%s\",\"buffer_size\":%d,\"hits\":%d,\"writes\":%d},\n",

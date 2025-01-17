@@ -29,7 +29,7 @@ struct DataFile * map_file_id(int file_id){
        return NULL;
 }
 
-
+int cc_thread = 0;
 
 char * workload_test;
 char * result_file_test;
@@ -68,6 +68,7 @@ void * buffer(void * arg){
     
     printf("\nExecution Time = %f seconds\n", time);
     printf("\nMax Block ID = %d\n", max_block_id);
+    printf("\nanalyze count = %d\n", cc_thread);
 
     export_json_final_result(result_file_test ,BUFFER_POLICY_NAME, BUFFER_SIZE, flush_operations, hit_operations, time);
 	//printf("\nPress Any Key to Exit\n");
@@ -77,13 +78,16 @@ void * buffer(void * arg){
 
 int ANALYZE_THREAD_FLAG = 1;
 
+
 void * analyze_thread(void * arg){
     int iternal = 0;
+    
     #ifdef ML3 
     while (ANALYZE_THREAD_FLAG == 1) {
         //printf("\nAnalyze Thread ...");
             //if(GC > iternal + 50){
                 analyze(NULL); 
+                cc_thread++;
                 //iternal = GC; 
            // }
         //sleep(0.0001);
@@ -95,6 +99,7 @@ void * analyze_thread(void * arg){
         //printf("\nAnalyze Thread ...");
             //if(GC > iternal + 50){
                 analyze(NULL); 
+                cc_thread++;
                 //iternal = GC; 
            // }
         //sleep(0.0001);
@@ -128,7 +133,7 @@ int main(int argc, char *argv[]) {
     //-------------------------------------------------------------
     printf("\n---------------------------------------------------------------\n");
     workload_test = argv[2];
-    result_file_test = result_file;
+    result_file_test = result_file; // result_file;  "tests.js";
 
     pthread_t workload_th;
     pthread_t analyze_th;
@@ -140,10 +145,6 @@ int main(int argc, char *argv[]) {
     pthread_join(workload_th, NULL);
     ANALYZE_THREAD_FLAG = 0;
     pthread_join(analyze_th, NULL);
-
-    //printf("\nMax Entropy = %f", MAX_Entropy);
-    //printf("\nMIn Entropy = %f\n", MIN_Entropy);
-
 
 	return 0;
 }
