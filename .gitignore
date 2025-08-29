@@ -8,3 +8,4 @@ Release
 .vscode
 *.exe
 result.json
+.DS_Store
