@@ -20,7 +20,7 @@ int file_open(char * path) {
 	int file;
     
     #ifdef O_DIRECT_MODE
-    	file = open(path, O_RDWR | O_CREAT | O_DIRECT, 0777);
+    	file = open(path, O_RDWR | O_CREAT | O_DIRECT, 0777); // O_SYNC ?
     #else
     	file = open(path, O_RDWR | O_CREAT, 0777);
     #endif
@@ -52,13 +52,19 @@ void file_read(int file_descriptor, long block_id, char * frame, int block_size)
 }
 
 void file_write(int file_descriptor, long block_id, char * frame, int block_size){
-	
 	lseek(file_descriptor, block_id * block_size, 0); //0 = SEEK_SET
 	if( write(file_descriptor, frame, block_size) == -1){
 		printf("\n[ERR0] Write Page %d-%ld \n",file_descriptor, (size_t) block_id);
 		perror("Error writing file");
 		exit(1);
 	}
+
+	#ifdef FSYNC_MODE
+	if (fdatasync(file_descriptor) == -1) {
+		perror("Error syncing file");
+		exit(1);
+	}
+	#endif
 }
 
 
