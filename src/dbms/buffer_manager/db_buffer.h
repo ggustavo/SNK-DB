@@ -85,6 +85,10 @@ void buffer_start() {
 		printf("\nBuffer - _GNU_SOURCE enable");
 	#endif
 
+	#ifdef FSYNC_MODE
+		printf("\nBuffer - FSYNC enable");
+	#endif
+
 	#ifdef O_DIRECT_MODE
 		printf("\nBuffer - O_DIRECT enable");
 		if (posix_memalign( (void**) &allocated_memory, BLOCK_SIZE, BUFFER_SIZE * BLOCK_SIZE) != 0) {
